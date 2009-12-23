@@ -1,0 +1,67 @@
+Neo4j resources library
+=======================
+
+The Neo4j resources library allows you to build an application which stores its data in
+the [http://neo4j.org/](Neo4j open source graph database) and exposes it through a
+domain-specific RESTful JSON API which you define. It is written in Scala and is intended
+to be used in other Scala projects, although you may be able to get it to work with
+other JVM-based langauges too. Projects using this library can build amazing databases
+with a minimum of boilerplate and unnecessary code.
+
+Please see the [Neo4j Scala template](http://github.com/ept/neo4j-scala-template/tree/master)
+as a starting point for your application based on the Neo4j resources library.
+
+
+Building
+--------
+
+You need a Java 5 (or newer) environment and Maven 2.0.9 (or newer) installed:
+
+    $ mvn --version
+    Maven version: 2.0.10
+    Java version: 1.6.0_03-p3
+    OS name: "darwin" version: "9.7.0" arch: "i386" Family: "unix"
+
+
+You should now be able to do a full build of `neo4j-resources`:
+
+    $ git clone git://github.com/jawher/neo4j-scala.git
+    $ cd neo4j-scala
+    $ mvn clean install
+
+To use this library in your projects, add the following to the `dependencies` section of your
+`pom.xml`:
+
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-scala</artifactId>
+      <version>0.9.0-SNAPSHOT</version>
+    </dependency>
+
+If you don't use Maven, take `target/neo4j-scala-0.9.0-SNAPSHOT.jar` and all of its dependencies, and add them to your classpath.
+
+To use the project in Eclipse, you must have the Eclipse Scala plugin installed.
+You should also do a full Maven build before using Eclipse, to ensure you have
+all the dependencies downloaded. Then you should be able to do
+"File -> Import -> General -> Existing Projects into Workspace"
+and be ready to go. Note that at the time of writing, the Eclipse Scala
+plugin appears to have a bug which causes it not to write any class files to the
+target directory.
+
+
+Troubleshooting
+---------------
+
+
+
+Using this library
+------------------
+
+
+
+
+License
+-------
+
+See `LICENSE` for details.
+
