@@ -32,7 +32,7 @@ To use this library in your projects, add the following to the `dependencies` se
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-scala</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.9.9-SNAPSHOT</version>
     </dependency>
 
 If you don't use Maven, take `target/neo4j-scala-0.9.0-SNAPSHOT.jar` and all of its dependencies, and add them to your classpath.
@@ -54,7 +54,10 @@ Using this wrapper, this is how creating two relationships can look in Scala:
 And this is how getting and setting properties on a node or relationship looks like :
 
     start("foo") = "bar"
-    val foo = start("foo");
+    start("foo") match {
+    	case Some(x) => println(x)
+	case None => println("aww")
+    }
 
 Besides, the neo4j scala binding makes it possible to write stop and returnable evaluators in a functional style :
 
