@@ -3,7 +3,6 @@ package org.neo4j.scala
 import org.specs._
 import org.specs.runner._
 import org.neo4j.api.core._
-//import org.neo4j.scala.Neo4jConverters._
 
 class Neo4jWrapperSpecTest extends JUnit4(Neo4jWrapperSpec)
 
@@ -60,7 +59,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
       }
     }
 
-    "3allow relationships of the same direction to be chained" in {
+    "allow relationships of the same direction to be chained" in {
       execInNeo4j { neo =>
         val start = neo.createNode
         val middle = neo.createNode
@@ -73,7 +72,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
       }
     }
 
-    "4allow relationships of different directions to be chained" in {
+    "allow relationships of different directions to be chained" in {
       execInNeo4j { neo =>
         val left = neo.createNode
         val middle = neo.createNode
@@ -103,7 +102,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
       }
     }
 
-    "7create a property in a node in node('property')=value notation" in {
+    "create a property in a node in node('property')=value notation" in {
       execInNeo4j { neo =>
         val start = neo.createNode
         start("foo") = "bar"
@@ -111,7 +110,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
       }
     }
 
-    "8read a property in a relationship in rel('property') notation" in {
+    "read a property in a relationship in rel('property') notation" in {
       execInNeo4j { neo =>
         val start = neo.createNode
         val end = neo.createNode
