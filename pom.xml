@@ -4,7 +4,7 @@
   <artifactId>neo4j-scala</artifactId>
   <packaging>bundle</packaging>
   <name>Neo4j Scala</name>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>0.9.9-SNAPSHOT</version>
   <description>Scala wrapper for Neo4j Graph Database</description>
   <url>http://github.com/jawher/neo4j-scala</url>
   <inceptionYear>2009</inceptionYear>
@@ -12,7 +12,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <scala.version>2.7.7</scala.version>
-    <neo4j.version>1.0-b10</neo4j.version>
+    <neo4j.version>1.0-rc</neo4j.version>
   </properties>
 
   <developers>
@@ -84,13 +84,12 @@
     <!-- Neo4j graph database -->
     <dependency>
       <groupId>org.neo4j</groupId>
-      <artifactId>neo</artifactId>
+      <artifactId>neo4j-kernel</artifactId>
       <version>${neo4j.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.neo4j</groupId>
-      <artifactId>shell</artifactId>
+      <artifactId>neo4j-shell</artifactId>
       <version>${neo4j.version}</version>
     </dependency>
   </dependencies>

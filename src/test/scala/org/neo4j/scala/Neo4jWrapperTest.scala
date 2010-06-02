@@ -2,14 +2,17 @@ package org.neo4j.scala
 
 import org.specs._
 import org.specs.runner._
-import org.neo4j.api.core._
+
+import org.neo4j.graphdb._
+import org.neo4j.kernel.EmbeddedGraphDatabase
+
 
 class Neo4jWrapperSpecTest extends JUnit4(Neo4jWrapperSpec)
 
 object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
   "NeoWrapper" should {
     shareVariables()
-    implicit val neo : NeoService = new EmbeddedNeo("/tmp/temp-neo-test")
+    implicit val neo : GraphDatabaseService = new EmbeddedGraphDatabase("/tmp/temp-neo-test")
     
     Runtime.getRuntime.addShutdownHook(new Thread() {
         override def run() {

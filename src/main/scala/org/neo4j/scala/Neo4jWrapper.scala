@@ -1,6 +1,6 @@
 package org.neo4j.scala
 
-import org.neo4j.api.core._
+import org.neo4j.graphdb._
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -22,7 +22,7 @@ trait Neo4jWrapper {
    * Execute instructions within a Neo4j transaction; rollback if exception is raised and
    * commit otherwise; and return the return value from the operation.
    */
-  def execInNeo4j[T<:Any](operation: NeoService => T)(implicit neo : NeoService): T = {
+  def execInNeo4j[T<:Any](operation: GraphDatabaseService => T)(implicit neo : GraphDatabaseService): T = {
     val tx = synchronized {
       neo.beginTx
     }
