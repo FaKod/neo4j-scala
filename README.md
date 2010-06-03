@@ -35,7 +35,7 @@ To use this library in your projects, add the following to the `dependencies` se
       <version>0.9.9-SNAPSHOT</version>
     </dependency>
 
-If you don't use Maven, take `target/neo4j-scala-0.9.0-SNAPSHOT.jar` and all of its dependencies, and add them to your classpath.
+If you don't use Maven, take `target/neo4j-scala-0.9.9-SNAPSHOT.jar` and all of its dependencies, and add them to your classpath.
 
 
 Troubleshooting
