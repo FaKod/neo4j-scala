@@ -18,11 +18,11 @@ import org.neo4j.graphdb._
  */
 trait Neo4jWrapper {
 
-    /**
+  /**
    * Execute instructions within a Neo4j transaction; rollback if exception is raised and
    * commit otherwise; and return the return value from the operation.
    */
-  def execInNeo4j[T<:Any](operation: GraphDatabaseService => T)(implicit neo : GraphDatabaseService): T = {
+  def withTx[T <: Any](neo: GraphDatabaseService)(operation: GraphDatabaseService => T): T = {
     val tx = synchronized {
       neo.beginTx
     }
@@ -35,49 +35,72 @@ trait Neo4jWrapper {
     }
   }
 
+  /**
+   *
+   */
+  def createNode(implicit neo: GraphDatabaseService):Node = neo.createNode
+
+  /**
+   * creates incoming and outgoing relationships
+   */
   class NodeRelationshipMethods(node: Node) {
 
     def -->(relType: RelationshipType) = new OutgoingRelationshipBuilder(node, relType)
 
-    // Create incoming relationship
-
     def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
   }
 
-  // Half-way through building an outgoing relationship
-  class OutgoingRelationshipBuilder(fromNode: Node, relType: RelationshipType) {
+  /**
+   * Half-way through building an outgoing relationship
+   */
+  private[scala] class OutgoingRelationshipBuilder(fromNode: Node, relType: RelationshipType) {
+
+    /**
+     *
+     */
     def -->(toNode: Node) = {
       fromNode.createRelationshipTo(toNode, relType)
       new NodeRelationshipMethods(toNode)
     }
   }
 
-  // Half-way through building an incoming relationship
-  class IncomingRelationshipBuilder(toNode: Node, relType: RelationshipType) {
+  /**
+   * Half-way through building an incoming relationship
+   */
+  private[scala] class IncomingRelationshipBuilder(toNode: Node, relType: RelationshipType) {
     def <--(fromNode: Node) = {
       fromNode.createRelationshipTo(toNode, relType)
       new NodeRelationshipMethods(fromNode)
     }
   }
 
+  /**
+   *
+   */
+  class RichPropertyContainer(propertyContainer: PropertyContainer) {
+
+    def apply(property: String): Option[Any] =
+      propertyContainer.hasProperty(property) match {
+        case true => Some(propertyContainer.getProperty(property))
+        case _ => None
+      }
+
+    def update(property: String, value: Any): Unit = propertyContainer.setProperty(property, value)
+  }
+
   implicit def node2relationshipBuilder(node: Node) = new NodeRelationshipMethods(node)
 
   implicit def string2RelationshipType(relType: String) = DynamicRelationshipType.withName(relType)
 
-  class RichPropertyContainer(propertyContainer: PropertyContainer) {
-    def apply(property: String) : Option[Any] = if(propertyContainer.hasProperty(property)) Some(propertyContainer.getProperty(property)) else None
-    def update(property: String, value: Any) : Unit = propertyContainer.setProperty(property, value)
-  }
-
   implicit def propertyContainer2RichPropertyContainer(propertyContainer: PropertyContainer) = new RichPropertyContainer(propertyContainer)
 
-  implicit def fn2StopEvaluator(e : TraversalPosition => Boolean) = 
+  implicit def fn2StopEvaluator(e: TraversalPosition => Boolean) =
     new StopEvaluator() {
-      def isStopNode(traversalPosition : TraversalPosition) = e(traversalPosition)
+      def isStopNode(traversalPosition: TraversalPosition) = e(traversalPosition)
     }
 
-  implicit def fn2ReturnableEvaluator(e : TraversalPosition => Boolean) = 
-    new ReturnableEvaluator () {
-      def isReturnableNode(traversalPosition : TraversalPosition) = e(traversalPosition)
+  implicit def fn2ReturnableEvaluator(e: TraversalPosition => Boolean) =
+    new ReturnableEvaluator() {
+      def isReturnableNode(traversalPosition: TraversalPosition) = e(traversalPosition)
     }
 }
