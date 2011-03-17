@@ -9,19 +9,21 @@ import org.neo4j.kernel.EmbeddedGraphDatabase
 
 class Neo4jWrapperSpecTest extends JUnit4(Neo4jWrapperSpec)
 
-object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
+object Neo4jWrapperSpec extends Specification with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
+
+  def neo4jStoreDir = "/tmp/temp-neo-test"
+
   "NeoWrapper" should {
     shareVariables()
-    val gds: GraphDatabaseService = new EmbeddedGraphDatabase("/tmp/temp-neo-test")
 
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() {
-        gds.shutdown
+        ds.gds.shutdown
       }
     })
 
     "create a new relationship in --> relType --> notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -33,7 +35,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "create a new relationship in --> \"relName\" --> notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -44,7 +46,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "create a new relationship in <-- relType <-- notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -56,7 +58,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "create a new relationship in <-- \"relName\" <-- notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -67,7 +69,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "allow relationships of the same direction to be chained" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val middle = createNode
@@ -81,7 +83,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "allow relationships of different directions to be chained" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val left = createNode
           val middle = createNode
@@ -95,7 +97,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "ignore a relationshipBuilder with no end node" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           start --> "foo"
@@ -104,7 +106,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "read a property in a node in node('property') notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           start.setProperty("foo", "bar")
@@ -114,7 +116,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "create a property in a node in node('property')=value notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           start("foo") = "bar"
@@ -123,7 +125,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "read a property in a relationship in rel('property') notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -135,7 +137,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "create a property in a relationship in rel('property')=value notation" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -146,7 +148,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "allow writing stop evaluators in a functional style" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode
@@ -158,7 +160,7 @@ object Neo4jWrapperSpec extends Specification with Neo4jWrapper {
     }
 
     "allow writing returnable evaluators in a functional style" in {
-      withTx(gds) {
+      withTx {
         implicit neo =>
           val start = createNode
           val end = createNode

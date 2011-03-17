@@ -18,16 +18,18 @@ import org.neo4j.graphdb._
  */
 trait Neo4jWrapper {
 
+  def ds: DatabaseService
+
   /**
    * Execute instructions within a Neo4j transaction; rollback if exception is raised and
    * commit otherwise; and return the return value from the operation.
    */
-  def withTx[T <: Any](neo: GraphDatabaseService)(operation: GraphDatabaseService => T): T = {
+  def withTx[T <: Any](operation: DatabaseService => T): T = {
     val tx = synchronized {
-      neo.beginTx
+      ds.gds.beginTx
     }
     try {
-      val ret = operation(neo)
+      val ret = operation(ds)
       tx.success
       return ret
     } finally {
@@ -38,7 +40,7 @@ trait Neo4jWrapper {
   /**
    *
    */
-  def createNode(implicit neo: GraphDatabaseService):Node = neo.createNode
+  def createNode(implicit ds: DatabaseService):Node = ds.gds.createNode
 
   /**
    * creates incoming and outgoing relationships
