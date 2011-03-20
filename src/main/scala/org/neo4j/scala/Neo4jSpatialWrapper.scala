@@ -1,7 +1,10 @@
 package org.neo4j.scala
 
-import org.neo4j.graphdb.GraphDatabaseService
-import org.neo4j.gis.spatial.{EditableLayer, Listener, SpatialDatabaseService}
+import org.neo4j.gis.spatial._
+import collection.mutable.Buffer
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
+import com.vividsolutions.jts.geom._
+import org.neo4j.graphdb.{Node, GraphDatabaseService}
 
 /**
  *
@@ -32,6 +35,18 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
     }
   }
 
+  /**
+   * retrieves the layer object and executes operation
+   */
+  def withLayer[T <: Any](getLayer: => EditableLayer)(operation: EditableLayer => T): T = {
+    val layer = getLayer
+    operation(layer)
+  }
+
+  /**
+   * DatabaseService Wrapper
+   */
+
   def deleteLayer(name: String, monitor: Listener)(implicit db: CombinedDatabaseService) =
     db.sds.deleteLayer(name, monitor)
 
@@ -41,5 +56,61 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
   /**
    * methods from Neo4jWrapper usage should still be possible
    */
-  implicit def databaseServiceToGraphDatabaseService(ds:CombinedDatabaseService):GraphDatabaseService = ds.gds
+  implicit def databaseServiceToGraphDatabaseService(ds: CombinedDatabaseService): GraphDatabaseService = ds.gds
+
+  /**
+   * Layer Wrapper
+   */
+
+  implicit def tupleToCoordinate(t: (Double, Double)): Coordinate = Coord(t._1, t._2)
+
+  def getGeometryFactory(implicit layer: EditableLayer) = layer.getGeometryFactory
+
+  def add(implicit layer: EditableLayer) = new AddGeometry(layer)
+
+  class AddGeometry(layer: EditableLayer) {
+    val gf = layer.getGeometryFactory
+
+    def newPoint(coordinate: Coordinate): SpatialDatabaseRecord = layer.add(gf.createPoint(coordinate))
+
+    def newPolygon(shell: LinearRing, holes: Array[LinearRing] = null) = layer.add(gf.createPolygon(shell, holes))
+  }
+
+  /**
+   * Database Record convenience defs
+   */
+
+  // converts SpatialDatabaseRecord to Node
+  implicit def spatialDatabaseRecordToNode(sdr: SpatialDatabaseRecord): Node = sdr.getGeomNode
+
+  // delegation to Neo4jWrapper
+  implicit def node2relationshipBuilder(sdr: SpatialDatabaseRecord) = new NodeRelationshipMethods(sdr.getGeomNode)
+}
+
+/**
+ * convenience object of handling Coordinates
+ */
+object Coord {
+  def apply(x: Double, y: Double) = new Coordinate(x, y)
+}
+
+/**
+ * convenience object for CoordinateArraySequence
+ */
+object CoordArraySequence {
+  def apply(b: Buffer[(Double, Double)]) = {
+    val a = for (t <- b; c = Coord(t._1, t._2)) yield c
+    new CoordinateArraySequence(a.toArray)
+  }
+}
+
+/**
+ * convenience object for LinearRing
+ */
+object LinRing {
+  def apply(cs: CoordinateSequence)(implicit layer: EditableLayer) =
+    new LinearRing(cs, layer.getGeometryFactory)
+
+  def apply(b: Buffer[(Double, Double)])(implicit layer: EditableLayer) =
+    new LinearRing(CoordArraySequence(b), layer.getGeometryFactory)
 }
