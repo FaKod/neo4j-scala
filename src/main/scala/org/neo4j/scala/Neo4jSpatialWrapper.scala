@@ -66,6 +66,10 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
   def getGeometryFactory(implicit layer: EditableLayer) = layer.getGeometryFactory
 
+  def toGeometry(envelope: Envelope)(implicit layer: EditableLayer): Geometry = getGeometryFactory.toGeometry(envelope)
+
+  def executeSearch(search: Search)(implicit layer: EditableLayer): Unit = layer.getIndex.executeSearch(search)
+
   def add(implicit layer: EditableLayer) = new AddGeometry(layer)
 
   class AddGeometry(layer: EditableLayer) {
@@ -85,6 +89,10 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
   // delegation to Neo4jWrapper
   implicit def node2relationshipBuilder(sdr: SpatialDatabaseRecord) = new NodeRelationshipMethods(sdr.getGeomNode)
+
+  implicit def nodeToSpatialDatabaseRecord(node: Node)(implicit layer: Layer): SpatialDatabaseRecord =
+    new SpatialDatabaseRecord(layer, node)
+
 }
 
 /**

@@ -63,37 +63,26 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
           cities --> "isCity" --> munich
 
           // adding new Polygon
-          val buf = Buffer((15.3, 56.2), (15.4, 56.3), (15.5, 56.4), (15.6, 56.5), (15.3, 56.2))
-          val bayern = add newPolygon (LinRing(buf))
+          val bayernBuffer = Buffer[(Double,Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
+          val bayern = add newPolygon (LinRing(bayernBuffer))
 
           bayern.setProperty("FederalState", "Bayern")
           munich --> "CapitalCityOf" --> bayern
 
-          val relation = munich.getSingleRelationship("CapitalCityOf", Direction.OUTGOING)
+          val searchBayern = new SearchWithin(bayern.getGeometry)
+          executeSearch(searchBayern)
+          for(r <- searchBayern.getResults)
+            r.getProperty("City") must beEqual("Munich")
 
-          relation.getStartNode must beEqual(spatialDatabaseRecordToNode(munich))
-          relation.getEndNode must beEqual(spatialDatabaseRecordToNode(bayern))
+          // search
+          val withinQuery = new SearchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))
+          executeSearch(withinQuery)
+          val results = withinQuery.getResults
 
-          for (r <- bayern.getRelationships)
-            println(r.getType)
-
-          for (r <- munich.getRelationships)
-            println(r.getType)
+          results.size must_== 2
         }
 
-        // search
-        val searchQuery = new SearchContain(layer.getGeometryFactory().toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))
-        layer.getIndex.executeSearch(searchQuery)
 
-        var results: Buffer[SpatialDatabaseRecord] = searchQuery.getResults
-
-        results.size must_== 0
-
-        val withinQuery = new SearchWithin(layer.getGeometryFactory().toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))
-        layer.getIndex().executeSearch(withinQuery)
-        results = withinQuery.getResults
-
-        results.size must_== 2
       }
 
     }
