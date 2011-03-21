@@ -63,23 +63,24 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
           cities --> "isCity" --> munich
 
           // adding new Polygon
-          val bayernBuffer = Buffer[(Double,Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
+          val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
           val bayern = add newPolygon (LinRing(bayernBuffer))
 
           bayern.setProperty("FederalState", "Bayern")
           munich --> "CapitalCityOf" --> bayern
 
-          val searchBayern = new SearchWithin(bayern.getGeometry)
-          executeSearch(searchBayern)
-          for(r <- searchBayern.getResults)
-            r.getProperty("City") must beEqual("Munich")
+          withSearchWithin(bayern.getGeometry) {
+            implicit s =>
+              executeSearch
+            for (r <- getResults)
+              r.getProperty("City") must beEqual("Munich")
+          }
 
-          // search
-          val withinQuery = new SearchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))
-          executeSearch(withinQuery)
-          val results = withinQuery.getResults
-
-          results.size must_== 2
+          withSearchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0))) {
+            implicit s =>
+              executeSearch
+            getResults.size must_== 2
+          }
         }
 
 

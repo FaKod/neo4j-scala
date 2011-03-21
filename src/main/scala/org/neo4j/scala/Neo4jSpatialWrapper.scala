@@ -5,6 +5,7 @@ import collection.mutable.Buffer
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.geom._
 import org.neo4j.graphdb.{Node, GraphDatabaseService}
+import query.SearchWithin
 
 /**
  *
@@ -68,7 +69,7 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
   def toGeometry(envelope: Envelope)(implicit layer: EditableLayer): Geometry = getGeometryFactory.toGeometry(envelope)
 
-  def executeSearch(search: Search)(implicit layer: EditableLayer): Unit = layer.getIndex.executeSearch(search)
+  //def executeSearch(search: Search)(implicit layer: EditableLayer): Unit = layer.getIndex.executeSearch(search)
 
   def add(implicit layer: EditableLayer) = new AddGeometry(layer)
 
@@ -92,6 +93,19 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
   implicit def nodeToSpatialDatabaseRecord(node: Node)(implicit layer: Layer): SpatialDatabaseRecord =
     new SpatialDatabaseRecord(layer, node)
+
+  /**
+   * Search convenience defs
+   */
+
+  def withSearchWithin[T <: Any](geometry: Geometry)(operation: (SearchWithin) => T): T = {
+    val search = new SearchWithin(geometry)
+    operation(search)
+  }
+
+  def executeSearch(implicit search:SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)
+
+  def getResults(implicit search:SearchWithin) = search.getResults
 
 }
 
