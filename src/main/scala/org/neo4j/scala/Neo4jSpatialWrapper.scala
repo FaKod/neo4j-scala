@@ -103,9 +103,17 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
     operation(search)
   }
 
-  def executeSearch(implicit search:SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)
+  def executeSearch(implicit search: SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)
 
-  def getResults(implicit search:SearchWithin) = search.getResults
+  def getResults(implicit search: SearchWithin) = search.getResults
+
+  /**
+   * node convenience defs
+   */
+
+  implicit def IsSpatialDatabaseRecordToNode(r: IsSpatialDatabaseRecord): Node = r.node.getGeomNode
+
+  implicit def record2relationshipBuilder(record: IsSpatialDatabaseRecord) = new NodeRelationshipMethods(record.node)
 
 }
 

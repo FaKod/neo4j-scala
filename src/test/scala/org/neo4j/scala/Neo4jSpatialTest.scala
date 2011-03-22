@@ -18,7 +18,7 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
 
   def neo4jStoreDir = "/tmp/temp-neo-spatial-test"
 
-  "NeoWrapper" should {
+  "NeoSpatialWrapper" should {
     shareVariables()
 
     Runtime.getRuntime.addShutdownHook(new Thread() {
@@ -27,7 +27,7 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
       }
     })
 
-    "Wrapper usage should be possible" in {
+    "allow usage of Neo4jWrapper" in {
 
       withSpatialTx {
         implicit db =>
@@ -41,18 +41,16 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
       }
     }
 
-    "interim test all" in {
+    "simplify layer, node and search usage" in {
 
       withSpatialTx {
         implicit db =>
 
+        // remove existing layer
+          deleteLayer("test", new NullListener)
+
         val cities = createNode
-
-        deleteLayer("test", new NullListener)
-        val layer = getOrCreateEditableLayer("test")
-        val gf = layer.getGeometryFactory
-
-
+        val federalStates = createNode
 
         withLayer(getOrCreateEditableLayer("test")) {
           implicit layer =>
@@ -65,8 +63,9 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
           // adding new Polygon
           val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
           val bayern = add newPolygon (LinRing(bayernBuffer))
-
           bayern.setProperty("FederalState", "Bayern")
+          federalStates --> "isFederalState" --> bayern
+
           munich --> "CapitalCityOf" --> bayern
 
           withSearchWithin(bayern.getGeometry) {
@@ -82,10 +81,43 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
             getResults.size must_== 2
           }
         }
+      }
+    }
+  }
 
+  "simplify Node wrapping" in {
+
+    withSpatialTx {
+      implicit db =>
+
+      // remove existing layer
+        deleteLayer("test", new NullListener)
+
+      val cities = createNode
+      val federalStates = createNode
+
+      withLayer(getOrCreateEditableLayer("test")) {
+        implicit layer =>
+
+        // adding Point
+        val munich = City((15.3, 56.2))
+        munich.name = "Munich"
+        cities --> "isCity" --> munich
+
+        val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
+        val bayern = FedaralState(bayernBuffer)
+        bayern.name = "Bayern"
+
+        federalStates --> "isFederalState" --> bayern
+        munich --> "CapitalCityOf" --> bayern
+
+        withSearchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0))) {
+          implicit s =>
+            executeSearch
+          getResults.size must_== 2
+        }
 
       }
-
     }
   }
 }
