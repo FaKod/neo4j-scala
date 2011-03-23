@@ -99,13 +99,15 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
       withLayer(getOrCreateEditableLayer("test")) {
         implicit layer =>
 
+          import NewSpatialNode._
+
         // adding Point
-        val munich = City((15.3, 56.2))
+        val munich = NewSpatialNode[City]((15.3, 56.2))
         munich.name = "Munich"
         cities --> "isCity" --> munich
 
         val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
-        val bayern = FedaralState(bayernBuffer)
+        val bayern = NewSpatialNode[FedaralState](bayernBuffer)
         bayern.name = "Bayern"
 
         federalStates --> "isFederalState" --> bayern

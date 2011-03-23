@@ -13,6 +13,13 @@ import query.SearchWithin
  * Date: 16.03.11
  * Time: 16:18
  */
+
+
+trait IsSpatialDatabaseRecord {
+  val node: SpatialDatabaseRecord
+}
+
+
 trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
   def ds: DatabaseService
