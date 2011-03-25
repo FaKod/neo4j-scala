@@ -21,7 +21,7 @@ trait IsSpatialDatabaseRecord {
 }
 
 
-trait Neo4jSpatialWrapper extends Neo4jWrapper {
+trait Neo4jSpatialWrapper extends Neo4jWrapper with Neo4jSpatialWrapperImplicits {
 
   implicit val ds: DatabaseService
 
@@ -51,6 +51,53 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
     val layer = getLayer
     operation(layer)
   }
+}
+
+/**
+ *
+ */
+trait Neo4jSpatialWrapperImplicits {
+
+  /**
+   * Search convenience defs
+   */
+
+  def withSearchWithin[T <: Any](geometry: Geometry)(operation: (SearchWithin) => T): T = {
+    val search = new SearchWithin(geometry)
+    operation(search)
+  }
+
+  def searchWithin(geometry: Geometry)(implicit layer: EditableLayer) = {
+    val search = new SearchWithin(geometry)
+    layer.getIndex.executeSearch(search)
+    val result: Buffer[SpatialDatabaseRecord] = search.getResults
+    result
+  }
+
+  def executeSearch(implicit search: SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)
+
+  def getResults(implicit search: SearchWithin) = search.getResults
+
+  /**
+   * node convenience defs
+   */
+
+  implicit def IsSpatialDatabaseRecordToNode(r: IsSpatialDatabaseRecord): Node = r.node.getGeomNode
+
+  implicit def record2relationshipBuilder(record: IsSpatialDatabaseRecord) = new NodeRelationshipMethods(record.node)
+
+  /**
+   * Database Record convenience defs
+   */
+
+  // converts SpatialDatabaseRecord to Node
+  implicit def spatialDatabaseRecordToNode(sdr: SpatialDatabaseRecord): Node = sdr.getGeomNode
+
+  // delegation to Neo4jWrapper
+  implicit def node2relationshipBuilder(sdr: SpatialDatabaseRecord) = new NodeRelationshipMethods(sdr.getGeomNode)
+
+  implicit def nodeToSpatialDatabaseRecord(node: Node)(implicit layer: Layer): SpatialDatabaseRecord =
+    new SpatialDatabaseRecord(layer, node)
 
   /**
    * DatabaseService Wrapper
@@ -81,56 +128,16 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
   def add(implicit layer: EditableLayer) = new AddGeometry(layer)
 
-  class AddGeometry(layer: EditableLayer) {
-    val gf = layer.getGeometryFactory
-
-    def newPoint(coordinate: Coordinate): SpatialDatabaseRecord = layer.add(gf.createPoint(coordinate))
-
-    def newPolygon(shell: LinearRing, holes: Array[LinearRing] = null) = layer.add(gf.createPolygon(shell, holes))
-  }
-
-  /**
-   * Database Record convenience defs
-   */
-
-  // converts SpatialDatabaseRecord to Node
-  implicit def spatialDatabaseRecordToNode(sdr: SpatialDatabaseRecord): Node = sdr.getGeomNode
-
-  // delegation to Neo4jWrapper
-  implicit def node2relationshipBuilder(sdr: SpatialDatabaseRecord) = new NodeRelationshipMethods(sdr.getGeomNode)
-
-  implicit def nodeToSpatialDatabaseRecord(node: Node)(implicit layer: Layer): SpatialDatabaseRecord =
-    new SpatialDatabaseRecord(layer, node)
-
-  /**
-   * Search convenience defs
-   */
-
-  def withSearchWithin[T <: Any](geometry: Geometry)(operation: (SearchWithin) => T): T = {
-    val search = new SearchWithin(geometry)
-    operation(search)
-  }
-
-  def searchWithin(geometry: Geometry)(implicit layer: EditableLayer) = {
-    val search = new SearchWithin(geometry)
-    layer.getIndex.executeSearch(search)
-    val result:Buffer[SpatialDatabaseRecord] = search.getResults
-    result
-  }
-
-  def executeSearch(implicit search: SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)
-
-  def getResults(implicit search: SearchWithin) = search.getResults
-
-  /**
-   * node convenience defs
-   */
-
-  implicit def IsSpatialDatabaseRecordToNode(r: IsSpatialDatabaseRecord): Node = r.node.getGeomNode
-
-  implicit def record2relationshipBuilder(record: IsSpatialDatabaseRecord) = new NodeRelationshipMethods(record.node)
-
 }
+
+private[scala] class AddGeometry(layer: EditableLayer) {
+  val gf = layer.getGeometryFactory
+
+  def newPoint(coordinate: Coordinate): SpatialDatabaseRecord = layer.add(gf.createPoint(coordinate))
+
+  def newPolygon(shell: LinearRing, holes: Array[LinearRing] = null) = layer.add(gf.createPolygon(shell, holes))
+}
+
 
 /**
  * convenience object of handling Coordinates

@@ -16,7 +16,7 @@ import org.neo4j.graphdb._
  *
  * Feel free to use this example to tell all your friends how awesome scala is :)
  */
-trait Neo4jWrapper {
+trait Neo4jWrapper extends Neo4jWrapperImplicits {
 
   def ds: DatabaseService
 
@@ -41,54 +41,52 @@ trait Neo4jWrapper {
    *
    */
   def createNode(implicit ds: DatabaseService): Node = ds.gds.createNode
+}
 
-  /**
-   * creates incoming and outgoing relationships
-   */
-  class NodeRelationshipMethods(node: Node) {
+/**
+ * creates incoming and outgoing relationships
+ */
+private[scala] class NodeRelationshipMethods(node: Node) {
+  def -->(relType: RelationshipType) = new OutgoingRelationshipBuilder(node, relType)
+  def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
+}
 
-    def -->(relType: RelationshipType) = new OutgoingRelationshipBuilder(node, relType)
-
-    def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
+/**
+ * Half-way through building an outgoing relationship
+ */
+private[scala] class OutgoingRelationshipBuilder(fromNode: Node, relType: RelationshipType) {
+  def -->(toNode: Node) = {
+    fromNode.createRelationshipTo(toNode, relType)
+    new NodeRelationshipMethods(toNode)
   }
+}
 
-  /**
-   * Half-way through building an outgoing relationship
-   */
-  private[scala] class OutgoingRelationshipBuilder(fromNode: Node, relType: RelationshipType) {
+/**
+ * Half-way through building an incoming relationship
+ */
+private[scala] class IncomingRelationshipBuilder(toNode: Node, relType: RelationshipType) {
+  def <--(fromNode: Node) = {
+    fromNode.createRelationshipTo(toNode, relType)
+    new NodeRelationshipMethods(fromNode)
+  }
+}
 
-    /**
-     *
-     */
-    def -->(toNode: Node) = {
-      fromNode.createRelationshipTo(toNode, relType)
-      new NodeRelationshipMethods(toNode)
+/**
+ * convenience for handling properties
+ */
+private[scala] class RichPropertyContainer(propertyContainer: PropertyContainer) {
+  def apply(property: String): Option[Any] =
+    propertyContainer.hasProperty(property) match {
+      case true => Some(propertyContainer.getProperty(property))
+      case _ => None
     }
-  }
+  def update(property: String, value: Any): Unit = propertyContainer.setProperty(property, value)
+}
 
-  /**
-   * Half-way through building an incoming relationship
-   */
-  private[scala] class IncomingRelationshipBuilder(toNode: Node, relType: RelationshipType) {
-    def <--(fromNode: Node) = {
-      fromNode.createRelationshipTo(toNode, relType)
-      new NodeRelationshipMethods(fromNode)
-    }
-  }
-
-  /**
-   *
-   */
-  class RichPropertyContainer(propertyContainer: PropertyContainer) {
-
-    def apply(property: String): Option[Any] =
-      propertyContainer.hasProperty(property) match {
-        case true => Some(propertyContainer.getProperty(property))
-        case _ => None
-      }
-
-    def update(property: String, value: Any): Unit = propertyContainer.setProperty(property, value)
-  }
+/**
+ * trait for implicits
+ */
+trait Neo4jWrapperImplicits {
 
   implicit def node2relationshipBuilder(node: Node) = new NodeRelationshipMethods(node)
 
@@ -105,4 +103,5 @@ trait Neo4jWrapper {
     new ReturnableEvaluator() {
       def isReturnableNode(traversalPosition: TraversalPosition) = e(traversalPosition)
     }
+
 }

@@ -22,10 +22,12 @@ object Types {
   type PolylineLocation = Buffer[(Double, Double)]
 }
 
+trait MyAllInOneTrait extends IsSpatialDatabaseRecord with Neo4jSpatialWrapperImplicits with Neo4jWrapperImplicits
+
 /**
  * example implementation for a City Node
  */
-class City(val node: SpatialDatabaseRecord) extends IsSpatialDatabaseRecord {
+class City(val node: SpatialDatabaseRecord) extends MyAllInOneTrait {
   object City {
     val KEY_CITY_NAME = "cityName"
   }
@@ -38,7 +40,8 @@ class City(val node: SpatialDatabaseRecord) extends IsSpatialDatabaseRecord {
 /**
  * example implementation for a polyline node (a federal state)
  */
-class FedaralState(val node: SpatialDatabaseRecord) extends IsSpatialDatabaseRecord {
+class FedaralState(val node: SpatialDatabaseRecord) extends MyAllInOneTrait {
+
   object FedaralState {
     val KEY_FEDSTATE_NAME = "federalState"
   }
@@ -48,10 +51,7 @@ class FedaralState(val node: SpatialDatabaseRecord) extends IsSpatialDatabaseRec
   }
 
   def getCapitalCity(implicit layer:EditableLayer) = {
-    val n = node.getGeomNode
-    val o = n.getSingleRelationship(
-      DynamicRelationshipType.withName("CapitalCityOf"), Direction.INCOMING
-    ).getOtherNode(node.getGeomNode)
+    val o = node.getSingleRelationship("CapitalCityOf", Direction.INCOMING).getOtherNode(node)
     new City(new SpatialDatabaseRecord(layer, o))
   }
 }
