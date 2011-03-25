@@ -36,6 +36,25 @@ Additionally I added some examples like those pattern shown in the [Neo4j Design
 	}
 	. . .
 	
+that finaly result in code as follows:
+
+     /**
+      * create Munich and "attach" it to the cities node
+      */
+     val munich = NewSpatialNode[City]((15.3, 56.2))
+     munich.name = "Munich"
+     cities --> "isCity" --> munich
+
+     /**
+      * create a polygon called Bayern, "attach" it to the federal state node and
+      * "attach" the capital city Munich
+      */
+     val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
+     val bayern = NewSpatialNode[FedaralState](bayernBuffer)
+     bayern.name = "Bayern"
+     federalStates --> "isFederalState" --> bayern
+     munich --> "CapitalCityOf" --> bayern
+	
 Lookes rather nice IMHO, but is still very incomplete...
 
 Neo4j Scala wrapper library
