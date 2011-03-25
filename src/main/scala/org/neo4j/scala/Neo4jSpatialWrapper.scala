@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.geom._
 import org.neo4j.graphdb.{Node, GraphDatabaseService}
 import query.SearchWithin
+import collection.JavaConversions._
 
 /**
  *
@@ -22,9 +23,9 @@ trait IsSpatialDatabaseRecord {
 
 trait Neo4jSpatialWrapper extends Neo4jWrapper {
 
-  def ds: DatabaseService
+  implicit val ds: DatabaseService
 
-  val sds: SpatialDatabaseService
+  implicit val sds: SpatialDatabaseService
 
   /**
    * Execute instructions within a Neo4j transaction; rollback if exception is raised and
@@ -108,6 +109,13 @@ trait Neo4jSpatialWrapper extends Neo4jWrapper {
   def withSearchWithin[T <: Any](geometry: Geometry)(operation: (SearchWithin) => T): T = {
     val search = new SearchWithin(geometry)
     operation(search)
+  }
+
+  def searchWithin(geometry: Geometry)(implicit layer: EditableLayer) = {
+    val search = new SearchWithin(geometry)
+    layer.getIndex.executeSearch(search)
+    val result:Buffer[SpatialDatabaseRecord] = search.getResults
+    result
   }
 
   def executeSearch(implicit search: SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)

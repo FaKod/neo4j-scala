@@ -1,9 +1,10 @@
 package org.neo4j.scala
 
-import org.neo4j.gis.spatial.{EditableLayer, SpatialDatabaseRecord}
 import Types._
 import annotation.implicitNotFound
 import collection.mutable.Buffer
+import org.neo4j.graphdb.{DynamicRelationshipType, Direction}
+import org.neo4j.gis.spatial.{SpatialDatabaseService, EditableLayer, SpatialDatabaseRecord}
 
 /**
  * Examples following this Design Guide: http://wiki.neo4j.org/content/Design_Guide
@@ -44,6 +45,14 @@ class FedaralState(val node: SpatialDatabaseRecord) extends IsSpatialDatabaseRec
   def name = node.getProperty(FedaralState.KEY_FEDSTATE_NAME)
   def name_=(n: String) {
     node.setProperty(FedaralState.KEY_FEDSTATE_NAME, n)
+  }
+
+  def getCapitalCity(implicit layer:EditableLayer) = {
+    val n = node.getGeomNode
+    val o = n.getSingleRelationship(
+      DynamicRelationshipType.withName("CapitalCityOf"), Direction.INCOMING
+    ).getOtherNode(node.getGeomNode)
+    new City(new SpatialDatabaseRecord(layer, o))
   }
 }
 

@@ -40,7 +40,7 @@ trait Neo4jWrapper {
   /**
    *
    */
-  def createNode(implicit ds: DatabaseService):Node = ds.gds.createNode
+  def createNode(implicit ds: DatabaseService): Node = ds.gds.createNode
 
   /**
    * creates incoming and outgoing relationships

@@ -113,12 +113,10 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
         federalStates --> "isFederalState" --> bayern
         munich --> "CapitalCityOf" --> bayern
 
-        withSearchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0))) {
-          implicit s =>
-            executeSearch
-          getResults.size must_== 2
-        }
+        var result = for( r <- searchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))) yield r
+        result.size must_== 2
 
+        bayern.getCapitalCity.name must beEqual (munich.name)
       }
     }
   }
