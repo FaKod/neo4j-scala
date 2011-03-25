@@ -47,7 +47,12 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
         implicit db =>
 
         // remove existing layer
+        try {
           deleteLayer("test", new NullListener)
+        }
+        catch {
+          case _ =>
+        }
 
         val cities = createNode
         val federalStates = createNode
@@ -81,42 +86,6 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
             getResults.size must_== 2
           }
         }
-      }
-    }
-  }
-
-  "simplify Node wrapping" in {
-
-    withSpatialTx {
-      implicit db =>
-
-      // remove existing layer
-        deleteLayer("test", new NullListener)
-
-      val cities = createNode
-      val federalStates = createNode
-
-      withLayer(getOrCreateEditableLayer("test")) {
-        implicit layer =>
-
-          import NewSpatialNode._
-
-        // adding Point
-        val munich = NewSpatialNode[City]((15.3, 56.2))
-        munich.name = "Munich"
-        cities --> "isCity" --> munich
-
-        val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
-        val bayern = NewSpatialNode[FedaralState](bayernBuffer)
-        bayern.name = "Bayern"
-
-        federalStates --> "isFederalState" --> bayern
-        munich --> "CapitalCityOf" --> bayern
-
-        var result = for( r <- searchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))) yield r
-        result.size must_== 2
-
-        bayern.getCapitalCity.name must beEqual (munich.name)
       }
     }
   }
