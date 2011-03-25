@@ -7,16 +7,17 @@ So you are able to create a city Munich as follows:
     val munich = add newPoint ((15.3, 56.2))
     munich.setProperty("City", "Munich")
 
-and attach it to a federal state like Bavaria:
+and attached it to a federal state like Bavaria:
 
     val bayernBuffer = Buffer[(Double, Double)]((15, 56), (16, 56), (15, 57), (16, 57), (15, 56))
     val bayern = add newPolygon (LinRing(bayernBuffer))
     bayern.setProperty("FederalState", "Bayern")
     federalStates --> "isFederalState" --> bayern
 
-Aditionally I added some examples like those shown in the [Neo4j Design Guide](http://wiki.neo4j.org/content/Design_Guide):
+Additionally I added some examples like those pattern shown in the [Neo4j Design Guide](http://wiki.neo4j.org/content/Design_Guide):
 
-	class FedaralState(val node: SpatialDatabaseRecord) extends MyAllInOneTrait {
+    . . .
+	class FedaralState(val node: SpatialDatabaseRecord) extends . . . {
 
 	  object FedaralState {
 	    val KEY_FEDSTATE_NAME = "federalState"
@@ -33,6 +34,7 @@ Aditionally I added some examples like those shown in the [Neo4j Design Guide](h
 	    new City(new SpatialDatabaseRecord(layer, o))
 	  }
 	}
+	. . .
 	
 Lookes rather nice IMHO, but is still very incomplete...
 
