@@ -5,6 +5,7 @@ import org.specs.Specification
 import org.neo4j.gis.spatial.NullListener
 import collection.mutable.Buffer
 import com.vividsolutions.jts.geom.Envelope
+import org.neo4j.gis.spatial.query.SearchWithin
 
 class SpatialTestsUsingTestNodesTest extends JUnit4(SpatialTestsUsingTestNodes)
 
@@ -60,7 +61,7 @@ object SpatialTestsUsingTestNodes extends Specification with Neo4jSpatialWrapper
           /**
            * search all geometries inside an Envelope
            */
-          var result = for (r <- searchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))) yield r
+          var result = for (r <- search[SearchWithin](toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0)))) yield r
           result.size must_== 2
 
           /**

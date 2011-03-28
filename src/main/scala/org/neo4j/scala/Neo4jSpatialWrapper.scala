@@ -67,8 +67,16 @@ trait Neo4jSpatialWrapperImplicits {
     operation(search)
   }
 
-  def searchWithin(geometry: Geometry)(implicit layer: EditableLayer) = {
-    val search = new SearchWithin(geometry)
+//  def searchWithin(geometry: Geometry)(implicit layer: EditableLayer) = {
+//    val search = new SearchWithin(geometry)
+//    layer.getIndex.executeSearch(search)
+//    val result: Buffer[SpatialDatabaseRecord] = search.getResults
+//    result
+//  }
+
+  def search[T <: AbstractSearch](geometry: Geometry)(implicit layer: EditableLayer, m: ClassManifest[T]) = {
+    val ctor = m.erasure.getConstructor(classOf[Geometry])
+    val search = ctor.newInstance(geometry).asInstanceOf[T]
     layer.getIndex.executeSearch(search)
     val result: Buffer[SpatialDatabaseRecord] = search.getResults
     result
