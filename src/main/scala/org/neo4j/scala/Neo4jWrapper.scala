@@ -1,6 +1,7 @@
 package org.neo4j.scala
 
 import org.neo4j.graphdb._
+import index.RelationshipIndex
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -104,4 +105,9 @@ trait Neo4jWrapperImplicits {
       def isReturnableNode(traversalPosition: TraversalPosition) = e(traversalPosition)
     }
 
+  /**
+   * Stuff for Indexes
+   */
+
+  implicit def indexManager(implicit ds: DatabaseService) = ds.gds.index
 }
