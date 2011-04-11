@@ -13,7 +13,7 @@ import collection.JavaConversions._
  * Time: 20:27
  */
 
-trait IndexProvider {
+trait Neo4jIndexProvider {
 
   /**
    * type convenience definition
