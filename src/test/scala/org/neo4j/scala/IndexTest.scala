@@ -18,7 +18,7 @@ with SpatialDatabaseServiceProvider with Neo4jIndexProvider {
 
   def neo4jStoreDir = "/tmp/temp-neo-index-test"
 
-  override def NodeIndexConfig = ("MyTestIndex", Option(Map("provider" -> "lucene", "type" -> "fulltext"))) :: Nil
+  override def NodeIndexConfig = ("MyTestIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
 
 
   "Neo4jIndexProvider" should {

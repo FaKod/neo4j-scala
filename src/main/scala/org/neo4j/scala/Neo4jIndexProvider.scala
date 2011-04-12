@@ -80,4 +80,9 @@ trait Neo4jIndexProvider {
    */
   def getRelationIndex(name: String) = relationIndexStore.get(name)
 
+  /**
+   * conversion to ease the use of optional configuration
+   */
+  implicit def mapToOptionMap(t:(String, Map[String, String])) = (t._1, Option(t._2))
+
 }
