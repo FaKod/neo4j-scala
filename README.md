@@ -57,6 +57,32 @@ that finaly result in code as follows:
 	
 Lookes rather nice IMHO, but is still very incomplete...
 
+Index Access
+============
+
+The access of the Neo4j Lucene Index will be handled by the trait Neo4jIndexProvider. 
+It can be used like this example to configure and use a index for full text search:
+
+	object XXX extends . . . with Neo4jIndexProvider {
+		
+	  override def NodeIndexConfig = ("MyTestIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
+	  . . .
+	      withSpatialTx {
+	        implicit db =>
+
+	        val theMatrix = createNode
+	        val theMatrixReloaded = createNode
+	        theMatrixReloaded.setProperty("name", "theMatrixReloaded")
+
+	        nodeIndex.add(theMatrix, "title", "The Matrix")
+	        nodeIndex.add(theMatrixReloaded, "title", "The Matrix Reloaded")
+	        // search in the fulltext index
+	        val found = nodeIndex.query("title", "reloAdEd")
+	        ...
+	      }
+	  . . .
+	}
+
 Neo4j Scala wrapper library
 =======================
 
