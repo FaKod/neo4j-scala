@@ -67,6 +67,8 @@ It can be used like this example to configure and use a index for full text sear
 		
 	  override def NodeIndexConfig = ("MyTestIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
 	  . . .
+	      val nodeIndex = getNodeIndex("MyTestIndex").get
+	
 	      withSpatialTx {
 	        implicit db =>
 
