@@ -1,7 +1,6 @@
 package org.neo4j.scala
 
-import org.neo4j.graphdb._
-import index.RelationshipIndex
+import org.neo4j.graphdb.{PropertyContainer, RelationshipType, Node}
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -17,7 +16,7 @@ import index.RelationshipIndex
  *
  * Feel free to use this example to tell all your friends how awesome scala is :)
  */
-trait Neo4jWrapper extends Neo4jWrapperImplicits {
+trait Neo4jWrapper extends Neo4jWrapperUtil {
 
   def ds: DatabaseService
 
@@ -82,32 +81,4 @@ private[scala] class RichPropertyContainer(propertyContainer: PropertyContainer)
       case _ => None
     }
   def update(property: String, value: Any): Unit = propertyContainer.setProperty(property, value)
-}
-
-/**
- * trait for implicits
- */
-trait Neo4jWrapperImplicits {
-
-  implicit def node2relationshipBuilder(node: Node) = new NodeRelationshipMethods(node)
-
-  implicit def string2RelationshipType(relType: String) = DynamicRelationshipType.withName(relType)
-
-  implicit def propertyContainer2RichPropertyContainer(propertyContainer: PropertyContainer) = new RichPropertyContainer(propertyContainer)
-
-  implicit def fn2StopEvaluator(e: TraversalPosition => Boolean) =
-    new StopEvaluator() {
-      def isStopNode(traversalPosition: TraversalPosition) = e(traversalPosition)
-    }
-
-  implicit def fn2ReturnableEvaluator(e: TraversalPosition => Boolean) =
-    new ReturnableEvaluator() {
-      def isReturnableNode(traversalPosition: TraversalPosition) = e(traversalPosition)
-    }
-
-  /**
-   * Stuff for Indexes
-   */
-
-  implicit def indexManager(implicit ds: DatabaseService) = ds.gds.index
 }

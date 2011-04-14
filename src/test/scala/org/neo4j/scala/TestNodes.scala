@@ -25,7 +25,7 @@ object Types {
 /**
  * convenience trait
  */
-trait MyAllInOneTrait extends IsSpatialDatabaseRecord with Neo4jSpatialWrapperImplicits with Neo4jWrapperImplicits
+trait MyAllInOneTrait extends IsSpatialDatabaseRecord with Neo4jSpatialWrapperUtil with Neo4jWrapperUtil
 
 /**
  * example implementation for a City Node
@@ -68,7 +68,7 @@ class FedaralState(val node: SpatialDatabaseRecord) extends MyAllInOneTrait {
  * factory object
  * creates new SpatialDatabaseRecords resp. Nodes via reflection
  */
-object NewSpatialNode extends Neo4jSpatialWrapperImplicits with Neo4jWrapperImplicits {
+object NewSpatialNode extends Neo4jSpatialWrapperUtil with Neo4jWrapperUtil {
 
   /**
    * uses a given node to create a instance of IsSpatialDatabaseRecord

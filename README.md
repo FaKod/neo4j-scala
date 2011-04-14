@@ -84,6 +84,8 @@ It can be used like this example to configure and use a index for full text sear
 	      }
 	  . . .
 	}
+	
+The rest if this README is the original one.
 
 Neo4j Scala wrapper library
 =======================

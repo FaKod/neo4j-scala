@@ -6,7 +6,7 @@ import scala.collection.mutable.{Map => mutableMap}
 import collection.JavaConversions._
 
 /**
- * Provides Index acces as trait if needed
+ * Provides Index access as trait
  *
  * @author Christopher Schmidt
  * Date: 11.04.11
