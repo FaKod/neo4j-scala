@@ -81,6 +81,14 @@ trait Neo4jSpatialWrapperUtil {
   def getOrCreateEditableLayer(name: String)(implicit db: CombinedDatabaseService): EditableLayer =
     db.sds.getOrCreateEditableLayer(name)
 
+  def createLayer(name: String)(implicit db: CombinedDatabaseService): EditableLayer =
+    db.sds.createLayer(name, classOf[WKBGeometryEncoder], classOf[EditableLayerImpl]).asInstanceOf[EditableLayer]
+
+  def getLayerNames(implicit db: CombinedDatabaseService) = db.sds.getLayerNames
+
+  def getLayer(name: String)(implicit db: CombinedDatabaseService): Layer =
+    db.sds.getLayer(name)
+
   /**
    * methods from Neo4jWrapper usage should still be possible
    */
