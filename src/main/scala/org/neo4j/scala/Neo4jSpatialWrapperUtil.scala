@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom._
 import org.neo4j.graphdb.{Node, GraphDatabaseService}
 import collection.JavaConversions._
 import query.{SearchWithinDistance, SearchWithin}
+import util.{AddGeometry, Coord}
 
 /**
  * Util and implicits Trait for spatial stuff

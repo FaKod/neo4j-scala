@@ -5,6 +5,7 @@ import annotation.implicitNotFound
 import collection.mutable.Buffer
 import org.neo4j.graphdb.{Direction}
 import org.neo4j.gis.spatial.{EditableLayer, SpatialDatabaseRecord}
+import util.{Coord, LinRing}
 
 /**
  * Examples following this Design Guide: http://wiki.neo4j.org/content/Design_Guide

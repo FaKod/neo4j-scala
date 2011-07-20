@@ -11,6 +11,7 @@ import com.vividsolutions.jts.geom.{LinearRing, Coordinate, Envelope}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import collection.JavaConversions._
 import org.neo4j.graphdb.{Node, RelationshipType, Direction, DynamicRelationshipType}
+import util.LinRing
 
 class Neo4jSpatialSpecTest extends JUnit4(Neo4jSpatialSpec)
 

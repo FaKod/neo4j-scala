@@ -1,4 +1,4 @@
-package org.neo4j.scala
+package org.neo4j.scala.util
 
 import org.neo4j.gis.spatial._
 import collection.mutable.Buffer
