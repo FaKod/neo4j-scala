@@ -2,8 +2,9 @@ package org.neo4j.scala
 
 import org.specs.runner.JUnit4
 import org.specs.Specification
-import util.{CaseClassDeserializer, JavaType}
+import util.{CaseClassDeserializer}
 import CaseClassDeserializer._
+import org.neo4j.graphdb.Node
 
 /**
  *
@@ -16,6 +17,8 @@ case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b:
 
 
 class DeSerializingTest extends JUnit4(DeSerializingSpec)
+
+class DeSerializing2Test extends JUnit4(DeSerializingSpec2)
 
 object DeSerializingSpec extends Specification {
 
@@ -37,9 +40,37 @@ object DeSerializingSpec extends Specification {
       var o = Test("sowas", 1, 2, 3.3, 10, true)
       var resMap = serialize(o)
 
-      resMap.size must_==  6
+      resMap.size must_== 6
       resMap.get("d").get mustEqual (3.3)
       resMap.get("b").get mustEqual (true)
+    }
+  }
+}
+
+object DeSerializingSpec2 extends Specification with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
+
+  def neo4jStoreDir = "/tmp/temp-neo-test2"
+
+  "Node" should {
+    shareVariables()
+
+    Runtime.getRuntime.addShutdownHook(new Thread() {
+      override def run() {
+        ds.gds.shutdown
+      }
+    })
+
+    "be serializable" in {
+      var o = Test("sowas", 1, 2, 3.3, 10, true)
+      var node: Node = null
+      withTx {
+        implicit neo =>
+          node = createNode
+        serializeCaseClass(o, node)
+      }
+
+      var oo = deSerializeCaseClass[Test](node)
+      oo must beEqual(o)
     }
   }
 }

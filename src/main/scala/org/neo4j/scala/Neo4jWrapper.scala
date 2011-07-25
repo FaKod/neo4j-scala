@@ -1,6 +1,9 @@
 package org.neo4j.scala
 
 import org.neo4j.graphdb.{PropertyContainer, RelationshipType, Node}
+import util.CaseClassDeserializer
+import CaseClassDeserializer._
+import collection.JavaConversions._
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -19,6 +22,8 @@ import org.neo4j.graphdb.{PropertyContainer, RelationshipType, Node}
 trait Neo4jWrapper extends Neo4jWrapperUtil {
 
   def ds: DatabaseService
+
+  val ClassPropertyName = "__CLASS__"
 
   /**
    * Execute instructions within a Neo4j transaction; rollback if exception is raised and
@@ -41,6 +46,30 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
    *
    */
   def createNode(implicit ds: DatabaseService): Node = ds.gds.createNode
+
+  /**
+   * serializes a given case class into a Node instance
+   */
+  def serializeCaseClass[T <: Product](cc: T, node: Node): Unit = {
+    serialize(cc).foreach {
+      case (name, value) => node.setProperty(name, value)
+    }
+    node.setProperty(ClassPropertyName, cc.getClass.toString)
+  }
+
+  /**
+   * deserializes a given case class type from a given Node instance
+   */
+  def deSerializeCaseClass[T <: Product](node: Node)(implicit m: ClassManifest[T]): T = {
+    val cpn = node.getProperty(ClassPropertyName).asInstanceOf[String]
+    val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
+    val o = deserialize[T](kv.toMap)(m)
+    if(cpn != null) {
+      if(!cpn.equalsIgnoreCase(o.getClass.toString))
+        throw new IllegalArgumentException("given Case Class does not fir to stored properties")
+    }
+    o
+  }
 }
 
 /**
@@ -48,6 +77,7 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
  */
 private[scala] class NodeRelationshipMethods(node: Node) {
   def -->(relType: RelationshipType) = new OutgoingRelationshipBuilder(node, relType)
+
   def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
 }
 
@@ -80,5 +110,6 @@ private[scala] class RichPropertyContainer(propertyContainer: PropertyContainer)
       case true => Some(propertyContainer.getProperty(property))
       case _ => None
     }
+
   def update(property: String, value: Any): Unit = propertyContainer.setProperty(property, value)
 }
