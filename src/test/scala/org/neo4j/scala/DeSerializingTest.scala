@@ -68,7 +68,7 @@ object DeSerializingSpec2 extends Specification with Neo4jWrapper with EmbeddedG
           node = createNode(o)
       }
 
-      var oo = deSerializeCaseClass[Test](node)
+      var oo = deSerialize[Test](node)
       oo must beEqual(o)
     }
   }

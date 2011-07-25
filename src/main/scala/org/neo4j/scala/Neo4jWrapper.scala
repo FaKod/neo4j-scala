@@ -1,7 +1,6 @@
 package org.neo4j.scala
 
 import util.CaseClassDeserializer
-import CaseClassDeserializer._
 import collection.JavaConversions._
 import org.neo4j.graphdb.{Relationship, PropertyContainer, RelationshipType, Node}
 
@@ -50,13 +49,13 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
   /**
    * convenience method to create and serialize
    */
-  def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node = serializeCaseClass(cc, createNode)
+  def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node = serialize(cc, createNode)
 
   /**
    * serializes a given case class into a Node instance
    */
-  def serializeCaseClass[T <: Product](cc: T, node: Node): Node = {
-    serialize(cc).foreach {
+  def serialize[T <: Product](cc: T, node: Node): Node = {
+    CaseClassDeserializer.serialize(cc).foreach {
       case (name, value) => node.setProperty(name, value)
     }
     node.setProperty(ClassPropertyName, cc.getClass.toString)
@@ -66,13 +65,13 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
   /**
    * deserializes a given case class type from a given Node instance
    */
-  def deSerializeCaseClass[T <: Product](node: Node)(implicit m: ClassManifest[T]): T = {
+  def deSerialize[T <: Product](node: Node)(implicit m: ClassManifest[T]): T = {
     val cpn = node.getProperty(ClassPropertyName).asInstanceOf[String]
     val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
-    val o = deserialize[T](kv.toMap)(m)
+    val o = CaseClassDeserializer.deserialize[T](kv.toMap)(m)
     if (cpn != null) {
       if (!cpn.equalsIgnoreCase(o.getClass.toString))
-        throw new IllegalArgumentException("given Case Class does not fir to stored properties")
+        throw new IllegalArgumentException("given Case Class does not fit to serialized properties")
     }
     o
   }
