@@ -1,6 +1,5 @@
 package org.neo4j.scala.util
 
-import org.neo4j.scala.so.neo
 import scalax.rules.scalasig._
 import collection.mutable.ArrayBuffer
 
