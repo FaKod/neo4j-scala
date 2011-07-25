@@ -1,9 +1,9 @@
 package org.neo4j.scala
 
-import org.neo4j.graphdb.{PropertyContainer, RelationshipType, Node}
 import util.CaseClassDeserializer
 import CaseClassDeserializer._
 import collection.JavaConversions._
+import org.neo4j.graphdb.{Relationship, PropertyContainer, RelationshipType, Node}
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -75,10 +75,10 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
 /**
  * creates incoming and outgoing relationships
  */
-private[scala] class NodeRelationshipMethods(node: Node) {
+private[scala] class NodeRelationshipMethods(node: Node, rel:Relationship = null) {
   def -->(relType: RelationshipType) = new OutgoingRelationshipBuilder(node, relType)
-
   def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
+  def < = rel
 }
 
 /**
@@ -86,8 +86,8 @@ private[scala] class NodeRelationshipMethods(node: Node) {
  */
 private[scala] class OutgoingRelationshipBuilder(fromNode: Node, relType: RelationshipType) {
   def -->(toNode: Node) = {
-    fromNode.createRelationshipTo(toNode, relType)
-    new NodeRelationshipMethods(toNode)
+    val rel = fromNode.createRelationshipTo(toNode, relType)
+    new NodeRelationshipMethods(toNode, rel)
   }
 }
 
@@ -96,8 +96,8 @@ private[scala] class OutgoingRelationshipBuilder(fromNode: Node, relType: Relati
  */
 private[scala] class IncomingRelationshipBuilder(toNode: Node, relType: RelationshipType) {
   def <--(fromNode: Node) = {
-    fromNode.createRelationshipTo(toNode, relType)
-    new NodeRelationshipMethods(fromNode)
+    val rel = fromNode.createRelationshipTo(toNode, relType)
+    new NodeRelationshipMethods(fromNode, rel)
   }
 }
 
