@@ -65,8 +65,7 @@ object DeSerializingSpec2 extends Specification with Neo4jWrapper with EmbeddedG
       var node: Node = null
       withTx {
         implicit neo =>
-          node = createNode
-        serializeCaseClass(o, node)
+          node = createNode(o)
       }
 
       var oo = deSerializeCaseClass[Test](node)

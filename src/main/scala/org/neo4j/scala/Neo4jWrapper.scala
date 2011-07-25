@@ -43,18 +43,24 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
   }
 
   /**
-   *
+   * creates a new Node from Database service
    */
   def createNode(implicit ds: DatabaseService): Node = ds.gds.createNode
 
   /**
+   * convenience method to create and serialize
+   */
+  def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node = serializeCaseClass(cc, createNode)
+
+  /**
    * serializes a given case class into a Node instance
    */
-  def serializeCaseClass[T <: Product](cc: T, node: Node): Unit = {
+  def serializeCaseClass[T <: Product](cc: T, node: Node): Node = {
     serialize(cc).foreach {
       case (name, value) => node.setProperty(name, value)
     }
     node.setProperty(ClassPropertyName, cc.getClass.toString)
+    node
   }
 
   /**
@@ -64,8 +70,8 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
     val cpn = node.getProperty(ClassPropertyName).asInstanceOf[String]
     val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
     val o = deserialize[T](kv.toMap)(m)
-    if(cpn != null) {
-      if(!cpn.equalsIgnoreCase(o.getClass.toString))
+    if (cpn != null) {
+      if (!cpn.equalsIgnoreCase(o.getClass.toString))
         throw new IllegalArgumentException("given Case Class does not fir to stored properties")
     }
     o
@@ -75,9 +81,11 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
 /**
  * creates incoming and outgoing relationships
  */
-private[scala] class NodeRelationshipMethods(node: Node, rel:Relationship = null) {
+private[scala] class NodeRelationshipMethods(node: Node, rel: Relationship = null) {
   def -->(relType: RelationshipType) = new OutgoingRelationshipBuilder(node, relType)
+
   def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
+
   def < = rel
 }
 
