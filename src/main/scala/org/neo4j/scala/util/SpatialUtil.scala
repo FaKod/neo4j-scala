@@ -4,7 +4,6 @@ import org.neo4j.gis.spatial._
 import collection.mutable.Buffer
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.geom._
-import collection.JavaConversions._
 
 /**
  * Really simple and very incomplete list of spatial utility classes
