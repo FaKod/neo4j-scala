@@ -23,20 +23,20 @@ trait Neo4jSpatialWrapperUtil {
    * Search convenience defs
    */
 
-  def withSearchWithin[T <: Any](geometry: Geometry)(operation: (SearchWithin) => T): T = {
-    val search = new SearchWithin(geometry)
+  def withSearchWithinDistance[T](point: Point, distance: Double)(operation: (SearchWithinDistance) => T): T = {
+    val search = new SearchWithinDistance(point, distance)
     operation(search)
   }
 
-  def searchWithinDistance(point: Point, distance:Double)(implicit layer: EditableLayer) = {
-      val search = new SearchWithinDistance(point, distance)
-      layer.getIndex.executeSearch(search)
-      val result: Buffer[SpatialDatabaseRecord] = search.getResults
-      result
-    }
+  def searchWithinDistance(point: Point, distance: Double)(implicit layer: EditableLayer) = {
+    val search = new SearchWithinDistance(point, distance)
+    layer.getIndex.executeSearch(search)
+    val result: Buffer[SpatialDatabaseRecord] = search.getResults
+    result
+  }
 
   /**
-   * handles most of the searches with one Geometry parameter
+   * handles the searches with one Geometry parameter
    */
   def search[T <: AbstractSearch](geometry: Geometry)(implicit layer: EditableLayer, m: ClassManifest[T]) = {
     val ctor = m.erasure.getConstructor(classOf[Geometry])
@@ -46,9 +46,15 @@ trait Neo4jSpatialWrapperUtil {
     result
   }
 
-  def executeSearch(implicit search: SearchWithin, layer: EditableLayer) = layer.getIndex.executeSearch(search)
+  def withSearch[T <: AbstractSearch](geometry: Geometry)(operation: (AbstractSearch) => Unit)(implicit m: ClassManifest[T]): Unit = {
+    val ctor = m.erasure.getConstructor(classOf[Geometry])
+    val search = ctor.newInstance(geometry).asInstanceOf[T]
+    operation(search)
+  }
 
-  def getResults(implicit search: SearchWithin) = search.getResults
+  def executeSearch(implicit search: Search, layer: EditableLayer) = layer.getIndex.executeSearch(search)
+
+  def getResults(implicit search: Search) = search.getResults
 
   /**
    * node convenience defs

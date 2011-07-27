@@ -74,14 +74,14 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
 
           munich --> "CapitalCityOf" --> bayern
 
-          withSearchWithin(bayern.getGeometry) {
+          withSearch[SearchWithin](bayern.getGeometry) {
             implicit s =>
               executeSearch
             for (r <- getResults)
               r.getProperty("City") must beEqual("Munich")
           }
 
-          withSearchWithin(toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0))) {
+          withSearch[SearchWithin](toGeometry(new Envelope(15.0, 16.0, 56.0, 57.0))) {
             implicit s =>
               executeSearch
             getResults.size must_== 2
