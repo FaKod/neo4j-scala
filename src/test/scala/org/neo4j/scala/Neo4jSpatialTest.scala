@@ -48,12 +48,12 @@ object Neo4jSpatialSpec extends Specification with Neo4jSpatialWrapper with Embe
         implicit db =>
 
         // remove existing layer
-        try {
-          deleteLayer("test", new NullListener)
-        }
-        catch {
-          case _ =>
-        }
+          try {
+            deleteLayer("test", new NullListener)
+          }
+          catch {
+            case _ =>
+          }
 
         val cities = createNode
         val federalStates = createNode
