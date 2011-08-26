@@ -41,8 +41,9 @@ with SpatialDatabaseServiceProvider with Neo4jIndexProvider {
         val theMatrixReloaded = createNode
         theMatrixReloaded.setProperty("name", "theMatrixReloaded")
 
-        nodeIndex.add(theMatrix, "title", "The Matrix")
-        nodeIndex.add(theMatrixReloaded, "title", "The Matrix Reloaded")
+        nodeIndex += (theMatrix, "title", "The Matrix")
+        nodeIndex += (theMatrixReloaded, "title", "The Matrix Reloaded")
+        
         // search in the fulltext index
         val found = nodeIndex.query("title", "reloAdEd")
         found.size must beGreaterThanOrEqualTo(1)

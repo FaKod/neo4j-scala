@@ -1,9 +1,9 @@
 package org.neo4j.scala
 
-import org.neo4j.graphdb.Node
 import org.neo4j.graphdb.index.{Index, RelationshipIndex}
 import scala.collection.mutable.{Map => mutableMap}
 import collection.JavaConversions._
+import org.neo4j.graphdb.{PropertyContainer, Node}
 
 /**
  * Provides Index access as trait
@@ -83,6 +83,18 @@ trait Neo4jIndexProvider {
   /**
    * conversion to ease the use of optional configuration
    */
-  implicit def mapToOptionMap(t:(String, Map[String, String])) = (t._1, Option(t._2))
+  implicit def mapToOptionMap(t: (String, Map[String, String])) = (t._1, Option(t._2))
+
+  /**
+   * wrapper class for subsequent implicit conversion
+   */
+  class IndexWrapper[T <: PropertyContainer](i: Index[T])  {
+    def +=(t: T, k: String, v: AnyRef) = i.add(t, k, v)
+  }
+
+  /**
+   * more convenient index adding
+   */
+  implicit def indexToRichIndex[T <: PropertyContainer](i: Index[T]) = new IndexWrapper[T](i)
 
 }
