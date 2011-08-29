@@ -90,6 +90,9 @@ trait Neo4jIndexProvider {
    */
   class IndexWrapper[T <: PropertyContainer](i: Index[T])  {
     def +=(t: T, k: String, v: AnyRef) = i.add(t, k, v)
+    def -=(t: T, k: String, v: AnyRef) = i.remove(t, k, v)
+    def -=(t: T, k: String) = i.remove(t, k)
+    def -=(t: T) = i.remove(t)
   }
 
   /**
