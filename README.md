@@ -94,7 +94,7 @@ The Neo4j Scala wrapper library allows you the [Neo4j open source graph database
 domain-specific simplified language. It is written in Scala and is intended
 to be used in other Scala projects.
 
-This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project. I thought it'd be usefull to extract the Neo4j DSL into a seperate project, and Marting agreed to this.
+This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project. I thought it'd be useful  to extract the Neo4j DSL into a separate project, and Marting agreed to this.
 
 
 Building
