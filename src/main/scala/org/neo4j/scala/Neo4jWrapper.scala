@@ -58,7 +58,7 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
     CaseClassDeserializer.serialize(cc).foreach {
       case (name, value) => node.setProperty(name, value)
     }
-    node.setProperty(ClassPropertyName, cc.getClass.toString)
+    node.setProperty(ClassPropertyName, cc.getClass.getName)
     node
   }
 
@@ -70,7 +70,7 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
     val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
     val o = CaseClassDeserializer.deserialize[T](kv.toMap)(m)
     if (cpn != null) {
-      if (!cpn.equalsIgnoreCase(o.getClass.toString))
+      if (!cpn.equalsIgnoreCase(o.getClass.getName))
         throw new IllegalArgumentException("given Case Class does not fit to serialized properties")
     }
     o
