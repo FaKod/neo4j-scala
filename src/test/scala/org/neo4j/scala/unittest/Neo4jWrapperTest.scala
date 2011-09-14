@@ -1,20 +1,18 @@
-package org.neo4j.scala
-
-import org.specs._
-import org.specs.runner._
+package org.neo4j.scala.unittest
 
 import org.neo4j.graphdb._
-import org.neo4j.kernel.EmbeddedGraphDatabase
+import org.specs2.mutable.SpecificationWithJUnit
+import org.neo4j.scala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 
+/**
+ * Test spec to check relationship builder and evaluators
+ */
 
-class Neo4jWrapperSpecTest extends JUnit4(Neo4jWrapperSpec)
-
-object Neo4jWrapperSpec extends Specification with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
+class Neo4jWrapperSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
   def neo4jStoreDir = "/tmp/temp-neo-test"
 
   "NeoWrapper" should {
-    shareVariables()
 
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() {

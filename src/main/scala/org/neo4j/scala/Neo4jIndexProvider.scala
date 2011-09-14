@@ -6,11 +6,8 @@ import collection.JavaConversions._
 import org.neo4j.graphdb.{PropertyContainer, Node}
 
 /**
- * Provides Index access as trait
- *
+ * Provides Index access trait
  * @author Christopher Schmidt
- * Date: 11.04.11
- * Time: 20:27
  */
 
 trait Neo4jIndexProvider {

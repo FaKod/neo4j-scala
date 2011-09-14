@@ -3,6 +3,7 @@ package org.neo4j.scala
 import util.CaseClassDeserializer
 import collection.JavaConversions._
 import org.neo4j.graphdb.{Relationship, PropertyContainer, RelationshipType, Node}
+import CaseClassDeserializer._
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -15,13 +16,14 @@ import org.neo4j.graphdb.{Relationship, PropertyContainer, RelationshipType, Nod
  *
  * can be replaced with a beautiful Scala one-liner:
  * <pre>start --> "KNOWS" --> intermediary --> "KNOWS" --> end</pre>
- *
- * Feel free to use this example to tell all your friends how awesome scala is :)
  */
-trait Neo4jWrapper extends Neo4jWrapperUtil {
+trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplicits {
 
-  def ds: DatabaseService
-
+  /**
+   * this name will be used to store the class name of
+   * the serialized case class that will be verified
+   * in deserialization
+   */
   val ClassPropertyName = "__CLASS__"
 
   /**
@@ -47,7 +49,7 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
   def createNode(implicit ds: DatabaseService): Node = ds.gds.createNode
 
   /**
-   * convenience method to create and serialize
+   * convenience method to create and serialize a case class
    */
   def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node = serialize(cc, createNode)
 
@@ -58,22 +60,26 @@ trait Neo4jWrapper extends Neo4jWrapperUtil {
     CaseClassDeserializer.serialize(cc).foreach {
       case (name, value) => node.setProperty(name, value)
     }
-    node.setProperty(ClassPropertyName, cc.getClass.getName)
+    node(ClassPropertyName) = cc.getClass.getName
     node
   }
 
   /**
    * deserializes a given case class type from a given Node instance
+   * throws a IllegalArgumentException if a Nodes properties
+   * do not fit to the case class properties
    */
   def deSerialize[T <: Product](node: Node)(implicit m: ClassManifest[T]): T = {
-    val cpn = node.getProperty(ClassPropertyName).asInstanceOf[String]
-    val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
-    val o = CaseClassDeserializer.deserialize[T](kv.toMap)(m)
-    if (cpn != null) {
-      if (!cpn.equalsIgnoreCase(o.getClass.getName))
-        throw new IllegalArgumentException("given Case Class does not fit to serialized properties")
+    node[String](ClassPropertyName) match {
+      case Some(cpn) =>
+        val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
+        val o = deserialize[T](kv.toMap)(m)
+        if (!cpn.equalsIgnoreCase(o.getClass.getName))
+          throw new IllegalArgumentException("given Case Class does not fit to serialized properties")
+        o
+      case _ =>
+        throw new IllegalArgumentException("this is not a Node with a serialized case class")
     }
-    o
   }
 }
 
@@ -85,6 +91,10 @@ private[scala] class NodeRelationshipMethods(node: Node, rel: Relationship = nul
 
   def <--(relType: RelationshipType) = new IncomingRelationshipBuilder(node, relType)
 
+  /**
+   * use this to get the created relationship object
+   * <pre>start --> "KNOWS" --> end <;</pre>
+   */
   def < = rel
 }
 
@@ -112,11 +122,21 @@ private[scala] class IncomingRelationshipBuilder(toNode: Node, relType: Relation
  * convenience for handling properties
  */
 private[scala] class RichPropertyContainer(propertyContainer: PropertyContainer) {
-  def apply(property: String): Option[Any] =
+
+  /**
+   * type of properties is normally Object
+   * use type identifier T to cast it
+   */
+  def apply[T](property: String): Option[T] =
     propertyContainer.hasProperty(property) match {
-      case true => Some(propertyContainer.getProperty(property))
+      case true => Some(propertyContainer.getProperty(property).asInstanceOf[T])
       case _ => None
     }
 
-  def update(property: String, value: Any): Unit = propertyContainer.setProperty(property, value)
+  /**
+   * updates the property
+   * <code>node("property") = value</code>
+   */
+  def update(property: String, value: Any): Unit =
+    propertyContainer.setProperty(property, value)
 }

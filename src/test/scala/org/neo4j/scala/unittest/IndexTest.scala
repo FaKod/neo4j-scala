@@ -1,20 +1,15 @@
-package org.neo4j.scala
+package org.neo4j.scala.unittest
 
-import org.specs.Specification
-import org.specs.runner.JUnit4
-import collection.JavaConversions._
+import org.specs2.mutable.SpecificationWithJUnit
+import org.neo4j.scala.{Neo4jIndexProvider, EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 
 /**
+ * Test spec to check usage of index convenience methods
  *
  * @author Christopher Schmidt
- * Date: 12.04.11
- * Time: 06:15
  */
 
-class IndexTest extends JUnit4(IndexTestSpec)
-
-object IndexTestSpec extends Specification with Neo4jSpatialWrapper with EmbeddedGraphDatabaseServiceProvider
-with SpatialDatabaseServiceProvider with Neo4jIndexProvider {
+class IndexTestSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider with Neo4jIndexProvider {
 
   def neo4jStoreDir = "/tmp/temp-neo-index-test"
 
@@ -22,7 +17,6 @@ with SpatialDatabaseServiceProvider with Neo4jIndexProvider {
 
 
   "Neo4jIndexProvider" should {
-    shareVariables()
 
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() {
@@ -34,7 +28,7 @@ with SpatialDatabaseServiceProvider with Neo4jIndexProvider {
 
       val nodeIndex = getNodeIndex("MyTestIndex").get
 
-      withSpatialTx {
+      withTx {
         implicit db =>
 
         val theMatrix = createNode

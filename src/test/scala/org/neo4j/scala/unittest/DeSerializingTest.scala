@@ -1,28 +1,22 @@
-package org.neo4j.scala
+package org.neo4j.scala.unittest
 
-import org.specs.runner.JUnit4
-import org.specs.Specification
-import util.{CaseClassDeserializer}
-import CaseClassDeserializer._
 import org.neo4j.graphdb.Node
+import org.specs2.mutable.SpecificationWithJUnit
+import org.neo4j.scala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
+import org.neo4j.scala.util.CaseClassDeserializer
 
 /**
+ * Test spec to check deserialization and serialization of case classes
  *
  * @author Christopher Schmidt
- * Date: 20.07.11
- * Time: 06:29
  */
 
 case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
+import CaseClassDeserializer._
+class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
 
-class DeSerializingTest extends JUnit4(DeSerializingSpec)
-
-class DeSerializing2Test extends JUnit4(DeSerializingSpec2)
-
-object DeSerializingSpec extends Specification {
-
-  "DeSerializing" should {
+  "De- and Serializing" should {
 
     "able to create an instance from map" in {
       val m = Map[String, AnyRef]("s" -> "sowas", "i" -> "1", "ji" -> "2", "d" -> (3.3).asInstanceOf[AnyRef], "l" -> "10", "b" -> "true")
@@ -47,12 +41,11 @@ object DeSerializingSpec extends Specification {
   }
 }
 
-object DeSerializingSpec2 extends Specification with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
+class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
   def neo4jStoreDir = "/tmp/temp-neo-test2"
 
   "Node" should {
-    shareVariables()
 
     Runtime.getRuntime.addShutdownHook(new Thread() {
       override def run() {
@@ -69,7 +62,7 @@ object DeSerializingSpec2 extends Specification with Neo4jWrapper with EmbeddedG
       }
 
       var oo = deSerialize[Test](node)
-      oo must beEqual(o)
+      oo must beEqualTo(o)
     }
   }
 }
