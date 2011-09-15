@@ -9,7 +9,6 @@ import org.neo4j.graphdb._
  * @author Christopher Schmidt
  */
 trait Neo4jWrapperImplicits {
-  self: Neo4jWrapper =>
 
   /**
    * converts to a relationship builder to use --> <-- methods
@@ -22,7 +21,7 @@ trait Neo4jWrapperImplicits {
   implicit def string2RelationshipType(relType: String) = DynamicRelationshipType.withName(relType)
 
   /**
-   * cpnversion to use property set and get convenience
+   * conversion to use property set and get convenience
    */
   implicit def propertyContainer2RichPropertyContainer(propertyContainer: PropertyContainer) = new RichPropertyContainer(propertyContainer)
 
