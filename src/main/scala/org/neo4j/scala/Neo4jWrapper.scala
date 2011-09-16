@@ -20,13 +20,6 @@ import CaseClassDeserializer._
 trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplicits {
 
   /**
-   * this name will be used to store the class name of
-   * the serialized case class that will be verified
-   * in deserialization
-   */
-  val ClassPropertyName = "__CLASS__"
-
-  /**
    * Execute instructions within a Neo4j transaction; rollback if exception is raised and
    * commit otherwise; and return the return value from the operation.
    */
@@ -51,8 +44,19 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
   /**
    * convenience method to create and serialize a case class
    */
-  def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node = serialize(cc, createNode)
+  def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node = Neo4jWrapper.serialize(cc, createNode)
+}
 
+/**
+ * Neo4jWrapper Object
+ */
+object Neo4jWrapper extends Neo4jWrapperImplicits {
+  /**
+   * this name will be used to store the class name of
+   * the serialized case class that will be verified
+   * in deserialization
+   */
+  val ClassPropertyName = "__CLASS__"
   /**
    * serializes a given case class into a Node instance
    */

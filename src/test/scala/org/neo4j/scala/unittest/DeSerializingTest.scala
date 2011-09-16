@@ -61,7 +61,7 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
           node = createNode(o)
       }
 
-      var oo = deSerialize[Test](node)
+      var oo = Neo4jWrapper.deSerialize[Test](node)
       oo must beEqualTo(o)
     }
   }
