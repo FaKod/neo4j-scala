@@ -1,34 +1,3 @@
-
-Index Access
-============
-
-The access of the Neo4j Lucene Index will be handled by the trait Neo4jIndexProvider. 
-It can be used like this example to configure and use a index for full text search:
-
-	object XXX extends . . . with Neo4jIndexProvider {
-		
-	  override def NodeIndexConfig = ("MyTestIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
-	  . . .
-	      val nodeIndex = getNodeIndex("MyTestIndex").get
-	
-	      withSpatialTx {
-	        implicit db =>
-
-	        val theMatrix = createNode
-	        val theMatrixReloaded = createNode
-	        theMatrixReloaded.setProperty("name", "theMatrixReloaded")
-
-	        nodeIndex.add(theMatrix, "title", "The Matrix")
-	        nodeIndex.add(theMatrixReloaded, "title", "The Matrix Reloaded")
-	        // search in the fulltext index
-	        val found = nodeIndex.query("title", "reloAdEd")
-	        ...
-	      }
-	  . . .
-	}
-	
-The rest if this README is the original one.
-
 Neo4j Scala wrapper library
 =======================
 
@@ -42,65 +11,108 @@ This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitt
 Building
 --------
 
-You need a Java 5 (or newer) environment and Maven 2.0.9 (or newer) installed:
-
-    $ mvn --version
-    Apache Maven 3.0-alpha-5 (r883378; 2009-11-23 16:53:41+0100)
-    Java version: 1.6.0_15
-    Java home: /usr/lib/jvm/java-6-sun-1.6.0.15/jre
-    Default locale: en_US, platform encoding: UTF-8
-    OS name: "linux" version: "2.6.31-12-generic" arch: "i386" Family: "unix"
-
-You should now be able to do a full build of `neo4j-resources`:
-
-    $ git clone git://github.com/jawher/neo4j-scala.git
+    $ git clone git://github.com/fakod/neo4j-scala.git
     $ cd neo4j-scala
     $ mvn clean install
-
-To use this library in your projects, add the following to the `dependencies` section of your
-`pom.xml`:
-
-    <dependency>
-      <groupId>org.neo4j</groupId>
-      <artifactId>neo4j-scala</artifactId>
-      <version>0.9.9-SNAPSHOT</version>
-    </dependency>
-
-If you don't use Maven, take `target/neo4j-scala-0.9.9-SNAPSHOT.jar` and all of its dependencies, and add them to your classpath.
-
 
 Troubleshooting
 ---------------
 
-Please consider using [Github issues tracker](http://github.com/jawher/neo4j-scala/issues) to submit bug reports or feature requests.
+Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scala/issues) to submit bug reports or feature requests.
 
 
 Using this library
-------------------
+==================
+
+Graph Database Service Provider
+------------------------------
+Neo4j Scala Wrapper needs a Graph Database Service Provider, it has to implement GraphDatabaseServiceProvider trait.
+One possibility is to use the EmbeddedGraphDatabaseServiceProvider for embedded Neo4j instances where you simply have to
+define a neo4jStoreDir.
+A class using the wrapper is f.e.:
+
+    class MyNeo4jClass extends SomethingClass with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
+      def neo4jStoreDir = "/tmp/temp-neo-test"
+      . . .
+    }
+
+Transaction Wrapping
+--------------------
+Transactions are wrapped by withTx. After leaving the "scope" success is called or rollback if exception is raised:
+
+    withTx {
+     implicit neo =>
+       val start = createNode
+       val end = createNode
+       start --> "foo" --> end
+    }
+
+Using the Lucene Index
+---------------------
+Neo4j provides indexes for nodes and relationships. The indexes can be configured by mixing in the Neo4jIndexProvider trait.
+See [Indexing](http://docs.neo4j.org/chunked/stable/indexing.html)
+
+    class MyNeo4jClass extends . . . with Neo4jIndexProvider {
+      // configuration for the index being created.
+      override def NodeIndexConfig = ("MyTest1stIndex", Map("provider" -> "lucene", "type" -> "fulltext")) ::
+                                     ("MyTest2ndIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
+    }
+
+Use one of the configured indexes with
+
+    val nodeIndex = getNodeIndex("MyTest1stIndex").get
+
+Add and remove entires by:
+
+    nodeIndex += (Node_A, "title", "The Matrix")
+    nodeIndex -= (Node_A)
+
+Relations
+---------
 
 Using this wrapper, this is how creating two relationships can look in Scala:
 
     start --> "KNOWS" --> intermediary --> "KNOWS" --> end
+    left --> "foo" --> middle <-- "bar" <-- right
+
+Returning the Relation Object:
+
+    val relation = start --> "KNOWS" --> end <;
+
+Properties
+----------
 
 And this is how getting and setting properties on a node or relationship looks like :
 
+    // setting the property foo
     start("foo") = "bar"
     start("foo") match {
     	case Some(x) => println(x)
-	case None => println("aww")
+	    case None => println("aww")
     }
+
+Using Case Classes
+------------------
+Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the property names of the case class are used as keys and the values are stored Strings as well. Working types are limited.
+
+    case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
+    withTx {
+      implicit neo =>
+        // create Node with Case Class Test
+        val node1 = createNode(Test("Something", 1, 2, 3.3, 10, true))
+        // "recreate" Case Class Test from Node
+        val node2 = Neo4jWrapper.deSerialize[Test](node)
+    }
+
+Traversing
+----------
 
 Besides, the neo4j scala binding makes it possible to write stop and returnable evaluators in a functional style :
 
     //StopEvaluator.END_OF_GRAPH, written in a Scala idiomatic way :
-    start.traverse(Traverser.Order.BREADTH_FIRST, (tp : TraversalPosition) => false, ReturnableEvaluator.ALL_BUT_START_NODE, DynamicRelationshipType.withName("foo"), Direction.OUTGOING)
+    start.traverse(Traverser.Order.BREADTH_FIRST, (tp : TraversalPosition) => false, ReturnableEvaluator.ALL_BUT_START_NODE, "foo", Direction.OUTGOING)
     
     //ReturnableEvaluator.ALL_BUT_START_NODE, written in a Scala idiomatic way :
-    start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), DynamicRelationshipType.withName("foo"), Direction.OUTGOING)
+    start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), "foo", Direction.OUTGOING)
 
-
-License
--------
-
-See `LICENSE` for details.
 
