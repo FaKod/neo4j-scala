@@ -8,6 +8,9 @@ to be used in other Scala projects.
 This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project.
 
 
+You may find [Neo4j-Spatial-Scala](http://github.com/FaKod/neo4j-spatial-scala) interesting as well.
+
+
 Building
 --------
 
@@ -84,7 +87,8 @@ And this is how getting and setting properties on a node or relationship looks l
 
     // setting the property foo
     start("foo") = "bar"
-    start("foo") match {
+    // cast Object to String and match . . .
+    start[String]("foo") match {
     	case Some(x) => println(x)
 	    case None => println("aww")
     }
@@ -99,8 +103,15 @@ Neo4j provides storing keys (String) and values (Object) into Nodes. To store Ca
       implicit neo =>
         // create Node with Case Class Test
         val node1 = createNode(Test("Something", 1, 2, 3.3, 10, true))
+
         // "recreate" Case Class Test from Node
         val node2 = Neo4jWrapper.deSerialize[Test](node)
+
+        // or using Option[T] (returning Some[T] if possible)
+        val nodeOption: Option[Test] = node.toCC[Test]
+ 
+        // yield all Nodes that are of Case Class Test
+		val tests = for(n <- getTraverser; t <- n.toCC[Test]) yield t
     }
 
 Traversing

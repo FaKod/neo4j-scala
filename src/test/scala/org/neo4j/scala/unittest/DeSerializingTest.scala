@@ -14,6 +14,7 @@ import org.neo4j.scala.util.CaseClassDeserializer
 case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
 import CaseClassDeserializer._
+
 class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
 
   "De- and Serializing" should {
@@ -61,8 +62,14 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
           node = createNode(o)
       }
 
-      var oo = Neo4jWrapper.deSerialize[Test](node)
-      oo must beEqualTo(o)
+      var oo1 = Neo4jWrapper.deSerialize[Test](node)
+      oo1 must beEqualTo(o)
+
+      var oo2 = node.toCC[Test].get
+      oo2 must beEqualTo(o)
+
+      var oo3 = node.toCC[Test]
+      oo3 must beEqualTo(Option(o))
     }
   }
 }

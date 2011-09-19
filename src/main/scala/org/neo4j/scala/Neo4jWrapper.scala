@@ -57,6 +57,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    * in deserialization
    */
   val ClassPropertyName = "__CLASS__"
+
   /**
    * serializes a given case class into a Node instance
    */
@@ -69,20 +70,30 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
   }
 
   /**
+   * conditional case class deserialization
+   * Some(T) if possible
+   * None if not
+   */
+  def toCC[T <: Product](node: Node)(implicit m: ClassManifest[T]): Option[T] = {
+    node[String](ClassPropertyName) match {
+      case Some(cpn) if (cpn.equals(m.erasure.getName)) =>
+        val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
+        val o = deserialize[T](kv.toMap)
+        Some(o)
+      case _ =>
+        None
+    }
+  }
+
+  /**
    * deserializes a given case class type from a given Node instance
    * throws a IllegalArgumentException if a Nodes properties
    * do not fit to the case class properties
    */
   def deSerialize[T <: Product](node: Node)(implicit m: ClassManifest[T]): T = {
-    node[String](ClassPropertyName) match {
-      case Some(cpn) =>
-        val kv = for (k <- node.getPropertyKeys; v = node.getProperty(k)) yield (k -> v)
-        val o = deserialize[T](kv.toMap)(m)
-        if (!cpn.equalsIgnoreCase(o.getClass.getName))
-          throw new IllegalArgumentException("given Case Class does not fit to serialized properties")
-        o
-      case _ =>
-        throw new IllegalArgumentException("this is not a Node with a serialized case class")
+    toCC[T](node) match {
+      case Some(t) => t
+      case _ => throw new IllegalArgumentException("given Case Class: " + m.erasure.getName + " does not fit to serialized properties")
     }
   }
 }

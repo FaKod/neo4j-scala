@@ -45,4 +45,11 @@ trait Neo4jWrapperImplicits {
    * Stuff for Indexes
    */
   implicit def indexManager(implicit ds: DatabaseService) = ds.gds.index
+
+  /**
+   * for serialization
+   */
+  implicit def nodeToCaseClass(node: Node) = new {
+    def toCC[T <: Product](implicit m: ClassManifest[T]): Option[T] = Neo4jWrapper.toCC[T](node)
+  }
 }
