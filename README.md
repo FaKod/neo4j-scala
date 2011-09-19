@@ -5,7 +5,7 @@ The Neo4j Scala wrapper library allows you the [Neo4j open source graph database
 domain-specific simplified language. It is written in Scala and is intended
 to be used in other Scala projects.
 
-This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project. I thought it'd be useful  to extract the Neo4j DSL into a separate project, and Marting agreed to this.
+This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project.
 
 
 Building
@@ -27,8 +27,7 @@ Using this library
 Graph Database Service Provider
 ------------------------------
 Neo4j Scala Wrapper needs a Graph Database Service Provider, it has to implement GraphDatabaseServiceProvider trait.
-One possibility is to use the EmbeddedGraphDatabaseServiceProvider for embedded Neo4j instances where you simply have to
-define a neo4jStoreDir.
+One possibility is to use the EmbeddedGraphDatabaseServiceProvider for embedded Neo4j instances where you simply have to define a Neo4j storage directory.
 A class using the wrapper is f.e.:
 
     class MyNeo4jClass extends SomethingClass with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
@@ -38,7 +37,7 @@ A class using the wrapper is f.e.:
 
 Transaction Wrapping
 --------------------
-Transactions are wrapped by withTx. After leaving the "scope" success is called or rollback if exception is raised:
+Transactions are wrapped by withTx. After leaving the "scope" success is called (or rollback if an exception is raised):
 
     withTx {
      implicit neo =>
@@ -47,10 +46,9 @@ Transactions are wrapped by withTx. After leaving the "scope" success is called 
        start --> "foo" --> end
     }
 
-Using the Lucene Index
+Using an Index
 ---------------------
-Neo4j provides indexes for nodes and relationships. The indexes can be configured by mixing in the Neo4jIndexProvider trait.
-See [Indexing](http://docs.neo4j.org/chunked/stable/indexing.html)
+Neo4j provides indexes for nodes and relationships. The indexes can be configured by mixing in the Neo4jIndexProvider trait. See [Indexing](http://docs.neo4j.org/chunked/stable/indexing.html)
 
     class MyNeo4jClass extends . . . with Neo4jIndexProvider {
       // configuration for the index being created.
@@ -62,7 +60,7 @@ Use one of the configured indexes with
 
     val nodeIndex = getNodeIndex("MyTest1stIndex").get
 
-Add and remove entires by:
+Add and remove entries by:
 
     nodeIndex += (Node_A, "title", "The Matrix")
     nodeIndex -= (Node_A)
@@ -93,9 +91,10 @@ And this is how getting and setting properties on a node or relationship looks l
 
 Using Case Classes
 ------------------
-Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the property names of the case class are used as keys and the values are stored Strings as well. Working types are limited.
+Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the property names of the case class are used as keys and the values are stored Strings as well. Working types are limited to basic types like String, integer etc.
 
     case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
+    . . .
     withTx {
       implicit neo =>
         // create Node with Case Class Test
