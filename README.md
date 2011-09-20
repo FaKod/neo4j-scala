@@ -14,7 +14,7 @@ You may find [Neo4j-Spatial-Scala](http://github.com/FaKod/neo4j-spatial-scala) 
 Building
 --------
 
-    $ git clone git://github.com/fakod/neo4j-scala.git
+    $ git clone git://github.com/FaKod/neo4j-scala.git
     $ cd neo4j-scala
     $ mvn clean install
 
@@ -110,7 +110,7 @@ Neo4j provides storing keys (String) and values (Object) into Nodes. To store Ca
         // or using Option[T] (returning Some[T] if possible)
         val nodeOption: Option[Test] = node.toCC[Test]
  
-        // yield all Nodes that are of Case Class Test
+        // yield all Nodes that are of type Case Class Test
 		val tests = for(n <- getTraverser; t <- n.toCC[Test]) yield t
     }
 
