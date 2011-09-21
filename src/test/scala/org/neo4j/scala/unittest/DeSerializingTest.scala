@@ -1,6 +1,5 @@
 package org.neo4j.scala.unittest
 
-import org.neo4j.graphdb.Node
 import org.specs2.mutable.SpecificationWithJUnit
 import org.neo4j.scala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import org.neo4j.scala.util.CaseClassDeserializer
@@ -13,6 +12,10 @@ import org.neo4j.scala.util.CaseClassDeserializer
 
 case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
+case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean)
+
+case class NotTest(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
+
 import CaseClassDeserializer._
 
 class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
@@ -21,7 +24,7 @@ class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
 
     "able to create an instance from map" in {
       val m = Map[String, AnyRef]("s" -> "sowas", "i" -> "1", "ji" -> "2", "d" -> (3.3).asInstanceOf[AnyRef], "l" -> "10", "b" -> "true")
-      var r = deserialize[Test](m)
+      val r = deserialize[Test](m)
 
       r.s must endWith("sowas")
       r.i must_== (1)
@@ -32,8 +35,8 @@ class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
     }
 
     "able to create a map from an instance" in {
-      var o = Test("sowas", 1, 2, 3.3, 10, true)
-      var resMap = serialize(o)
+      val o = Test("sowas", 1, 2, 3.3, 10, true)
+      val resMap = serialize(o)
 
       resMap.size must_== 6
       resMap.get("d").get mustEqual (3.3)
@@ -54,22 +57,40 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
       }
     })
 
-    "be serializable" in {
-      var o = Test("sowas", 1, 2, 3.3, 10, true)
-      var node: Node = null
-      withTx {
-        implicit neo =>
-          node = createNode(o)
+    "be serializable with Test" in {
+      val o = Test("sowas", 1, 2, 3.3, 10, true)
+      val node = withTx {
+        createNode(o)(_)
       }
 
-      var oo1 = Neo4jWrapper.deSerialize[Test](node)
+      val oo1 = Neo4jWrapper.deSerialize[Test](node)
       oo1 must beEqualTo(o)
 
-      var oo2 = node.toCC[Test].get
-      oo2 must beEqualTo(o)
+      val oo2 = node.toCC[Test]
+      oo2 must beEqualTo(Option(o))
 
-      var oo3 = node.toCC[Test]
-      oo3 must beEqualTo(Option(o))
+      val oo3 = node.toCC[NotTest]
+      oo3 must beEqualTo(None)
+
+      Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
+    }
+
+    "be serializable with Test2" in {
+      val o = Test2(1, 3.3, true)
+      val node = withTx {
+        createNode(o)(_)
+      }
+
+      val oo1 = Neo4jWrapper.deSerialize[Test2](node)
+      oo1 must beEqualTo(o)
+
+      val oo2 = node.toCC[Test2]
+      oo2 must beEqualTo(Option(o))
+
+      val oo3 = node.toCC[NotTest]
+      oo3 must beEqualTo(None)
+
+      Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
     }
   }
 }
