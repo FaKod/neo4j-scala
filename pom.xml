@@ -14,8 +14,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.9.1</scala.version>
-        <neo4j.version>1.4.1</neo4j.version>
-        <neo4j.shell.version>1.4.1</neo4j.shell.version>
+        <neo4j.version>1.5-SNAPSHOT</neo4j.version>
+        <neo4j.shell.version>1.5-SNAPSHOT</neo4j.shell.version>
     </properties>
 
     <developers>
