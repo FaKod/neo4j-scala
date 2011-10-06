@@ -26,9 +26,10 @@ class Neo4jWrapperSpec extends SpecificationWithJUnit with Neo4jWrapper with Emb
           val start = createNode
           val end = createNode
           val relType = DynamicRelationshipType.withName("foo")
-          start --> relType --> end
-          start.getSingleRelationship(relType, Direction.OUTGOING).
-            getOtherNode(start) must beEqualTo(end)
+          val rel1 = start --> relType --> end <
+          val rel2 = start.getSingleRelationship(relType, Direction.OUTGOING)
+          rel2.getOtherNode(start) must beEqualTo(end)
+          rel1 must beEqualTo(rel2)
       }
     }
 
@@ -49,9 +50,10 @@ class Neo4jWrapperSpec extends SpecificationWithJUnit with Neo4jWrapper with Emb
           val start = createNode
           val end = createNode
           val relType = DynamicRelationshipType.withName("foo")
-          end <-- relType <-- start
-          start.getSingleRelationship(relType, Direction.OUTGOING).
-            getOtherNode(start) must beEqualTo(end)
+          val rel1 = end <-- relType <-- start <
+          val rel2 = start.getSingleRelationship(relType, Direction.OUTGOING)
+          rel2.getOtherNode(start) must beEqualTo(end)
+          rel1 must beEqualTo(rel2)
       }
     }
 

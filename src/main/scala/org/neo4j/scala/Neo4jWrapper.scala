@@ -45,7 +45,7 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
    * convenience method to create and serialize a case class
    */
   def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node =
-    Neo4jWrapper.serialize(cc, createNode).asInstanceOf[Node]
+    Neo4jWrapper.serialize(cc, createNode)
 }
 
 /**
@@ -62,12 +62,12 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
   /**
    * serializes a given case class into a Node instance
    */
-  def serialize(cc: Product, pc: PropertyContainer): PropertyContainer = {
+  def serialize[T <: PropertyContainer](cc: Product, pc: PropertyContainer): T = {
     CaseClassDeserializer.serialize(cc).foreach {
       case (name, value) => pc.setProperty(name, value)
     }
     pc(ClassPropertyName) = cc.getClass.getName
-    pc
+    pc.asInstanceOf[T]
   }
 
   /**
@@ -109,12 +109,14 @@ private[scala] class NodeRelationshipMethods(node: Node, rel: Relationship = nul
 
   /**
    * use this to get the created relationship object
-   * <pre>start --> "KNOWS" --> end <;</pre>
+   * <pre>start --> "KNOWS" --> end <()</pre>
    */
-  def < = rel
+  def <() = rel
 
-  def <(cc: Product) =
-    Neo4jWrapper.serialize(cc, rel).asInstanceOf[Relationship]
+  /**
+   * <pre>start --> "KNOWS" --> end <(MyCaseClass(...))</pre>
+   */
+  def <(cc: Product):Relationship = Neo4jWrapper.serialize(cc, rel)
 }
 
 /**

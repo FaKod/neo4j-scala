@@ -100,7 +100,7 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
         implicit neo =>
         val start = createNode
         val end = createNode
-        end <-- "foo" <-- start <(o)
+        end <-- "foo" <-- start < o
 
         val rel = start.getSingleRelationship("foo", Direction.OUTGOING)
         val oo = rel.toCC[Test2]

@@ -78,7 +78,7 @@ Using this wrapper, this is how creating two relationships can look in Scala:
 
 Returning the Relation Object:
 
-    val relation = start --> "KNOWS" --> end <;
+    val relation = start --> "KNOWS" --> end <
 
 Properties
 ----------
@@ -101,7 +101,7 @@ Neo4j provides storing keys (String) and values (Object) into Nodes. To store Ca
     . . .
     withTx {
       implicit neo =>
-        // create Node with Case Class Test
+        // create new Node with Case Class Test
         val node1 = createNode(Test("Something", 1, 2, 3.3, 10, true))
 
         // "recreate" Case Class Test from Node
@@ -112,6 +112,9 @@ Neo4j provides storing keys (String) and values (Object) into Nodes. To store Ca
  
         // yield all Nodes that are of type Case Class Test
 		val tests = for(n <- getTraverser; t <- n.toCC[Test]) yield t
+		
+		// create new relation with Case Class Test
+		node1 --> "foo" --> node2 < Test("other", 0, 1, 1.3, 1, false)
     }
 
 Traversing
