@@ -3,6 +3,7 @@ package org.neo4j.scala.unittest
 import org.specs2.mutable.SpecificationWithJUnit
 import org.neo4j.scala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import org.neo4j.scala.util.CaseClassDeserializer
+import org.neo4j.graphdb.{Direction, DynamicRelationshipType}
 
 /**
  * Test spec to check deserialization and serialization of case classes
@@ -91,6 +92,20 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
       oo3 must beEqualTo(None)
 
       Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
+    }
+
+    "be possible with relations" in {
+      val o = Test2(1, 3.3, true)
+      withTx {
+        implicit neo =>
+        val start = createNode
+        val end = createNode
+        end <-- "foo" <-- start <(o)
+
+        val rel = start.getSingleRelationship("foo", Direction.OUTGOING)
+        val oo = rel.toCC[Test2]
+        oo must beEqualTo(Some(o))
+      }
     }
   }
 }
