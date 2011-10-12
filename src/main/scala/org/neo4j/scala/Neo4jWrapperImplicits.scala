@@ -50,6 +50,6 @@ trait Neo4jWrapperImplicits {
    * for serialization
    */
   implicit def nodeToCaseClass(pc: PropertyContainer) = new {
-    def toCC[T <: Product](implicit m: ClassManifest[T]): Option[T] = Neo4jWrapper.toCC[T](pc)
+    def toCC[T: Manifest]: Option[T] = Neo4jWrapper.toCC[T](pc)
   }
 }

@@ -44,7 +44,7 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
   /**
    * convenience method to create and serialize a case class
    */
-  def createNode[T <: Product](cc: T)(implicit ds: DatabaseService): Node =
+  def createNode(cc: AnyRef)(implicit ds: DatabaseService): Node =
     Neo4jWrapper.serialize(cc, createNode)
 }
 
@@ -62,7 +62,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
   /**
    * serializes a given case class into a Node instance
    */
-  def serialize[T <: PropertyContainer](cc: Product, pc: PropertyContainer): T = {
+  def serialize[T <: PropertyContainer](cc: AnyRef, pc: PropertyContainer): T = {
     CaseClassDeserializer.serialize(cc).foreach {
       case (name, value) => pc.setProperty(name, value)
     }
@@ -75,7 +75,20 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    * Some(T) if possible
    * None if not
    */
-  def toCC[T <: Product](pc: PropertyContainer)(implicit m: ClassManifest[T]): Option[T] = {
+  def toCC[T: Manifest](pc: PropertyContainer): Option[T] =
+    if (toCCPossible(pc)) {
+      val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
+      val o = deserialize[T](kv.toMap)
+      Some(o)
+    }
+    else
+      None
+
+  /**
+   * only checks if this property container has been serialized
+   * with T
+   */
+  def toCCPossible[T: Manifest](pc: PropertyContainer): Boolean =
     pc[String](ClassPropertyName) match {
       case Some(cpn) if (cpn.equals(m.erasure.getName)) =>
         val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
@@ -91,10 +104,11 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    * throws a IllegalArgumentException if a Nodes properties
    * do not fit to the case class properties
    */
-  def deSerialize[T <: Product](pc: PropertyContainer)(implicit m: ClassManifest[T]): T = {
+  def deSerialize[T: Manifest](pc: PropertyContainer): T = {
     toCC[T](pc) match {
       case Some(t) => t
-      case _ => throw new IllegalArgumentException("given Case Class: " + m.erasure.getName + " does not fit to serialized properties")
+      case _ => throw new IllegalArgumentException("given Case Class: " +
+        manifest[T].erasure.getName + " does not fit to serialized properties")
     }
   }
 }
@@ -116,7 +130,7 @@ private[scala] class NodeRelationshipMethods(node: Node, rel: Relationship = nul
   /**
    * <pre>start --> "KNOWS" --> end <(MyCaseClass(...))</pre>
    */
-  def <(cc: Product):Relationship = Neo4jWrapper.serialize(cc, rel)
+  def <(cc: AnyRef): Relationship = Neo4jWrapper.serialize(cc, rel)
 }
 
 /**
