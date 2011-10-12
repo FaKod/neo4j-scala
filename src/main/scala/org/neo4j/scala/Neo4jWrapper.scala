@@ -90,14 +90,11 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    */
   def toCCPossible[T: Manifest](pc: PropertyContainer): Boolean =
     pc[String](ClassPropertyName) match {
-      case Some(cpn) if (cpn.equals(m.erasure.getName)) =>
-        val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
-        val o = deserialize[T](kv.toMap)
-        Some(o)
+      case Some(cpn) if (cpn.equals(manifest[T].erasure.getName)) =>
+        true
       case _ =>
-        None
+        false
     }
-  }
 
   /**
    * deserializes a given case class type from a given Node instance

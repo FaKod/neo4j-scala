@@ -51,5 +51,7 @@ trait Neo4jWrapperImplicits {
    */
   implicit def nodeToCaseClass(pc: PropertyContainer) = new {
     def toCC[T: Manifest]: Option[T] = Neo4jWrapper.toCC[T](pc)
+
+    def toCCPossible[T: Manifest]: Boolean = Neo4jWrapper.toCCPossible[T](pc)
   }
 }
