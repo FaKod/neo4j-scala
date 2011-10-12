@@ -1,7 +1,7 @@
 package org.neo4j.scala.util
 
 import scalax.rules.scalasig._
-import collection.mutable.ArrayBuffer
+import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
 
 /**
  * helper class to store Class object
@@ -14,13 +14,23 @@ case class JavaType(c: Class[_])
 object CaseClassDeserializer {
 
   /**
+   * Method Map cache for method serialize
+   */
+  private val methodCache = new HashMap[AnyRef, Map[String, java.lang.reflect.Method]]()
+    with SynchronizedMap[AnyRef, Map[String, java.lang.reflect.Method]]
+
+  /**
+   * signature parser cache
+   */
+  private val sigParserCache = new HashMap[Class[_], Seq[(String, JavaType)]]()
+    with SynchronizedMap[Class[_], Seq[(String, JavaType)]]
+
+  /**
    * convenience method using class manifest
    * use it like <code>val test = deserialize[Test](myMap)<code>
    */
-  def deserialize[T: ClassManifest](m: Map[String, AnyRef]): T = {
-    val cm = implicitly[ClassManifest[T]]
-    deserialize(m, JavaType(cm.erasure)).asInstanceOf[T]
-  }
+  def deserialize[T: Manifest](m: Map[String, AnyRef]): T =
+    deserialize(m, JavaType(manifest[T].erasure)).asInstanceOf[T]
 
   /**Creates a case class instance from parameter map
    *
@@ -30,7 +40,7 @@ object CaseClassDeserializer {
   def deserialize(m: Map[String, AnyRef], javaTypeTarget: JavaType) = {
     require(javaTypeTarget.c.getConstructors.length == 1, "Case classes must only have one constructor.")
     val constructor = javaTypeTarget.c.getConstructors.head
-    val params = CaseClassSigParser.parse(javaTypeTarget.c)
+    val params = sigParserCache.getOrElseUpdate(javaTypeTarget.c, CaseClassSigParser.parse(javaTypeTarget.c))
 
     val values = new ArrayBuffer[AnyRef]
     for ((paramName, paramType) <- params) {
@@ -38,7 +48,7 @@ object CaseClassDeserializer {
 
       /**
        * if the value is directly assignable: use it
-       * otherwise try to create an instnace using der String Constructor
+       * otherwise try to create an instance using der String Constructor
        */
       if (field.getClass.isAssignableFrom(paramType.c))
         values += field
@@ -56,14 +66,15 @@ object CaseClassDeserializer {
    * @param o AnyRef case class instance
    */
   def serialize(o: AnyRef): Map[String, AnyRef] = {
-    val methods = o.getClass.getDeclaredMethods
-      .filter {
-      _.getParameterTypes.isEmpty
-    }
-      .map {
-      m => m.getName -> m
-    }.toMap
-    val params = CaseClassSigParser.parse(o.getClass)
+    val methods = methodCache.getOrElseUpdate(o,
+      o.getClass.getDeclaredMethods
+        .filter {
+        _.getParameterTypes.isEmpty
+      }
+        .map {
+        m => m.getName -> m
+      }.toMap)
+    val params = sigParserCache.getOrElseUpdate(o.getClass, CaseClassSigParser.parse(o.getClass))
     val l = for ((paramName, _) <- params; value = methods.get(paramName).get.invoke(o)) yield (paramName, value)
     l.toMap
   }
