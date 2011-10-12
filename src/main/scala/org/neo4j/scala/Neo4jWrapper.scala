@@ -2,8 +2,9 @@ package org.neo4j.scala
 
 import util.CaseClassDeserializer
 import collection.JavaConversions._
-import org.neo4j.graphdb.{Relationship, PropertyContainer, RelationshipType, Node}
 import CaseClassDeserializer._
+import org.neo4j.graphdb._
+import index.IndexManager
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -46,6 +47,71 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
    */
   def createNode(cc: AnyRef)(implicit ds: DatabaseService): Node =
     Neo4jWrapper.serialize(cc, createNode)
+
+  /**
+   * Looks up a node by id.
+   *
+   * @param id the id of the node
+   * @return the node with id <code>id</code> if found
+   * @throws NotFoundException if not found
+   */
+  def getNodeById(id: Long)(implicit ds: DatabaseService): Node =
+    ds.gds.getNodeById(id)
+
+  /**
+   * Looks up a relationship by id.
+   *
+   * @param id the id of the relationship
+   * @return the relationship with id <code>id</code> if found
+   * @throws NotFoundException if not found
+   */
+  def getRelationshipById(id: Long)(implicit ds: DatabaseService): Relationship =
+    ds.gds.getRelationshipById(id)
+
+  /**
+   * Returns the reference node, which is a "starting point" in the node
+   * space. Usually, a client attaches relationships to this node that leads
+   * into various parts of the node space. For more information about common
+   * node space organizational patterns, see the design guide at <a
+   * href="http://wiki.neo4j.org/content/Design_Guide"
+   * >wiki.neo4j.org/content/Design_Guide</a>.
+   *
+   * @return the reference node
+   * @throws NotFoundException if unable to get the reference node
+   */
+  def getReferenceNode(implicit ds: DatabaseService): Node =
+    ds.gds.getReferenceNode
+
+  /**
+   * Returns all nodes in the node space.
+   *
+   * @return all nodes in the node space
+   */
+  def getAllNodes(implicit ds: DatabaseService): Iterable[Node] =
+    ds.gds.getAllNodes
+
+  /**
+   * Returns all relationship types currently in the underlying store.
+   * Relationship types are added to the underlying store the first time they
+   * are used in a successfully commited {@link Node#createRelationshipTo
+   * node.createRelationshipTo(...)}. Note that this method is guaranteed to
+   * return all known relationship types, but it does not guarantee that it
+   * won't return <i>more</i> than that (e.g. it can return "historic"
+   * relationship types that no longer have any relationships in the node
+   * space).
+   *
+   * @return all relationship types in the underlying store
+   */
+  def getRelationshipTypes(implicit ds: DatabaseService): Iterable[RelationshipType] =
+    ds.gds.getRelationshipTypes
+
+  /**
+   * Shuts down Neo4j. After this method has been invoked, it's invalid to
+   * invoke any methods in the Neo4j API and all references to this instance
+   * of GraphDatabaseService should be discarded.
+   */
+  def shutdown(implicit ds: DatabaseService): Unit =
+    ds.gds.shutdown
 }
 
 /**
