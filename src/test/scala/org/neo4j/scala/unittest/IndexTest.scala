@@ -3,6 +3,7 @@ package org.neo4j.scala.unittest
 import org.specs2.mutable.SpecificationWithJUnit
 import org.neo4j.scala.{Neo4jIndexProvider, EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import collection.JavaConversions._
+import sys.ShutdownHookThread
 
 /**
  * Test spec to check usage of index convenience methods
@@ -19,11 +20,9 @@ class IndexTestSpec extends SpecificationWithJUnit with Neo4jWrapper with Embedd
 
   "Neo4jIndexProvider" should {
 
-    Runtime.getRuntime.addShutdownHook(new Thread() {
-      override def run() {
-        ds.gds.shutdown
-      }
-    })
+    ShutdownHookThread {
+      shutdown(ds)
+    }
 
     "use the fulltext search index" in {
 

@@ -4,6 +4,7 @@ import org.specs2.mutable.SpecificationWithJUnit
 import org.neo4j.scala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import org.neo4j.scala.util.CaseClassDeserializer
 import org.neo4j.graphdb.{Direction, DynamicRelationshipType}
+import sys.ShutdownHookThread
 
 /**
  * Test spec to check deserialization and serialization of case classes
@@ -52,11 +53,9 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
 
   "Node" should {
 
-    Runtime.getRuntime.addShutdownHook(new Thread() {
-      override def run() {
-        ds.gds.shutdown
-      }
-    })
+    ShutdownHookThread {
+      shutdown(ds)
+    }
 
     "be serializable with Test" in {
       val o = Test("sowas", 1, 2, 3.3, 10, true)
