@@ -35,31 +35,48 @@ trait Neo4jIndexProvider {
   /**
    * private cache
    */
-  private val nodeIndexStore = mutableMap[String, Index[Node]]()
+  private var nodeIndexStore: mutableMap[String, Index[Node]] = null
 
   /**
    * private cache
    */
-  private val relationIndexStore = mutableMap[String, RelationshipIndex]()
+  private var relationIndexStore: mutableMap[String, RelationshipIndex] = null
 
   /**
-   * constructor creates indexes
+   * lazy initializes Indexes for Nodes
    */
-  for (forNode <- NodeIndexConfig) {
-    nodeIndexStore += forNode._1 ->
-      (forNode._2 match {
-        case Some(config) => getIndexManager.forNodes(forNode._1, config)
-        case _ => getIndexManager.forNodes(forNode._1)
-      })
-  }
+  private def getNodeIndexStore =
+    nodeIndexStore match {
+      case null =>
+        nodeIndexStore = mutableMap[String, Index[Node]]()
+        for (forNode <- NodeIndexConfig) {
+          nodeIndexStore += forNode._1 ->
+            (forNode._2 match {
+              case Some(config) => getIndexManager.forNodes(forNode._1, config)
+              case _ => getIndexManager.forNodes(forNode._1)
+            })
+        }
+        nodeIndexStore
+      case x => x
+    }
 
-  for (forRelation <- RelationIndexConfig) {
-    relationIndexStore += forRelation._1 ->
-      (forRelation._2 match {
-        case Some(config) => getIndexManager.forRelationships(forRelation._1, config)
-        case _ => getIndexManager.forRelationships(forRelation._1)
-      })
-  }
+  /**
+   * lazy initializes Indexes for Relations
+   */
+  private def getRelationIndexStore =
+    relationIndexStore match {
+      case null =>
+        relationIndexStore = mutableMap[String, RelationshipIndex]()
+        for (forRelation <- RelationIndexConfig) {
+          relationIndexStore += forRelation._1 ->
+            (forRelation._2 match {
+              case Some(config) => getIndexManager.forRelationships(forRelation._1, config)
+              case _ => getIndexManager.forRelationships(forRelation._1)
+            })
+        }
+        relationIndexStore
+      case x => x
+    }
 
   /**
    * returns the index manager
@@ -70,12 +87,12 @@ trait Neo4jIndexProvider {
   /**
    * @return Option[Index[Node]] the created index if available
    */
-  def getNodeIndex(name: String) = nodeIndexStore.get(name)
+  def getNodeIndex(name: String) = getNodeIndexStore.get(name)
 
   /**
    * @return Option[RelationshipIndex] the created index if available
    */
-  def getRelationIndex(name: String) = relationIndexStore.get(name)
+  def getRelationIndex(name: String) = getRelationIndexStore.get(name)
 
   /**
    * conversion to ease the use of optional configuration
@@ -85,10 +102,13 @@ trait Neo4jIndexProvider {
   /**
    * wrapper class for subsequent implicit conversion
    */
-  class IndexWrapper[T <: PropertyContainer](i: Index[T])  {
+  class IndexWrapper[T <: PropertyContainer](i: Index[T]) {
     def +=(t: T, k: String, v: AnyRef) = i.add(t, k, v)
+
     def -=(t: T, k: String, v: AnyRef) = i.remove(t, k, v)
+
     def -=(t: T, k: String) = i.remove(t, k)
+
     def -=(t: T) = i.remove(t)
   }
 
