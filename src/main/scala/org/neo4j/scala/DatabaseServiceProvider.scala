@@ -28,3 +28,23 @@ trait EmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider 
   val ds: DatabaseService = DatabaseServiceImpl(new EmbeddedGraphDatabase(neo4jStoreDir))
 }
 
+/**
+ * provides a specific Database Service
+ * in this case an singleton embedded database service
+ */
+trait SingletonEmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider {
+
+  object Provider {
+    val ds: DatabaseService = DatabaseServiceImpl(new EmbeddedGraphDatabase(neo4jStoreDir))
+  }
+
+  /**
+   * directory where to store the data files
+   */
+  def neo4jStoreDir: String
+
+  /**
+   * using an instance of an embedded graph database
+   */
+  val ds: DatabaseService = Provider.ds
+}
