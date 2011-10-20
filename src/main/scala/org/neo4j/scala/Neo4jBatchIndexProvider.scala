@@ -25,6 +25,16 @@ trait Neo4jBatchIndexProvider extends Neo4jIndexProvider {
    * store for IndexManager
    */
   override def getIndexManager: IndexManager = new BatchIndexManager(batchInserter)
+
+  /**
+   * converts implicitly to the underlying batch instance
+   */
+  implicit def nodeIndexToBatchIndex(ni: Index[Node]) = ni.asInstanceOf[BatchIndex]
+
+  /**
+   * converts implicitly to the underlying batch instance
+   */
+  implicit def relationIndexToBatchRelationshipIndex(ri: RelationshipIndex) = ri.asInstanceOf[BatchRelationshipIndex]
 }
 
 
@@ -40,10 +50,10 @@ class BatchIndexManager(bi: BatchInserter) extends IndexManager {
 
 
   def forNodes(indexName: String, customConfiguration: juMap[String, String]) =
-    new BatchIndex(batchInserterIndexProvider.nodeIndex(indexName, customConfiguration))
+    new BatchIndex(batchInserterIndexProvider.nodeIndex(indexName, customConfiguration), bi)
 
   def forRelationships(indexName: String, customConfiguration: juMap[String, String]) =
-    new BatchRelationshipIndex(batchInserterIndexProvider.relationshipIndex(indexName, customConfiguration))
+    new BatchRelationshipIndex(batchInserterIndexProvider.relationshipIndex(indexName, customConfiguration), bi)
 
   /**
    * Shuts down this index provider and ensures that all indexes are fully
@@ -78,14 +88,16 @@ class BatchIndexManager(bi: BatchInserter) extends IndexManager {
 /**
  * delegates Index[Node] methods to BatchInserterIndex methods
  */
-class BatchIndex(bii: BatchInserterIndex) extends Index[Node] {
+class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node] {
+
+  private val gds = bi.getGraphDbService
 
   /**
    * implicitly converts IndexHits[Long] to IndexHits[BatchNode]
    */
   private implicit def toNodeIndexHits(hits: IndexHits[java.lang.Long]): IndexHits[Node] = {
-    val listOfNodes = for (l <- hits.iterator) yield new BatchNode(l)
-    new ConstantScoreIterator[Node](listOfNodes)
+    val listOfNodes = for (l <- hits.iterator) yield gds.getNodeById(l)
+    new ConstantScoreIterator[Node](listOfNodes.toList)
   }
 
   def updateOrAdd(entityId: Long, properties: Map[String, AnyRef]) = bii.updateOrAdd(entityId, properties)
@@ -128,14 +140,16 @@ class BatchIndex(bii: BatchInserterIndex) extends Index[Node] {
 /**
  * delegates RelationshipIndex methods to BatchInserterIndex methods
  */
-class BatchRelationshipIndex(bii: BatchInserterIndex) extends RelationshipIndex {
+class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends RelationshipIndex {
+
+  private val gds = bi.getGraphDbService
 
   /**
    * implicitly converts IndexHits[Long] to IndexHits[BatchRelationship]
    */
   private implicit def toRelationshipIndexHits(hits: IndexHits[java.lang.Long]): IndexHits[Relationship] = {
-    val listOfNodes = for (l <- hits.iterator) yield new BatchRelationship(l)
-    new ConstantScoreIterator[Relationship](listOfNodes)
+    val listOfNodes = for (l <- hits.iterator) yield gds.getRelationshipById(l)
+    new ConstantScoreIterator[Relationship](listOfNodes.toList)
   }
 
   def updateOrAdd(entityId: Long, properties: Map[String, AnyRef]) = bii.updateOrAdd(entityId, properties)
@@ -182,135 +196,21 @@ class BatchRelationshipIndex(bii: BatchInserterIndex) extends RelationshipIndex 
 }
 
 /**
- * this class exists because this class:
- * see private static class org.neo4j.kernel.impl.batchinsert.NodeBatchImpl implements Node
- * is private. This is just a id container
- */
-class BatchNode(id: Long) extends Node {
-
-  /**
-   * id
-   */
-  def getId = id
-
-  def delete() {
-    throw new NotImplementedException
-  }
-
-  def getRelationships = throw new NotImplementedException
-
-  def hasRelationship = throw new NotImplementedException
-
-  def getRelationships(types: RelationshipType*) = throw new NotImplementedException
-
-  def getRelationships(direction: Direction, types: RelationshipType*) = throw new NotImplementedException
-
-  def hasRelationship(types: RelationshipType*) = throw new NotImplementedException
-
-  def hasRelationship(direction: Direction, types: RelationshipType*) = throw new NotImplementedException
-
-  def getRelationships(dir: Direction) = throw new NotImplementedException
-
-  def hasRelationship(dir: Direction) = throw new NotImplementedException
-
-  def getRelationships(`type` : RelationshipType, dir: Direction) = throw new NotImplementedException
-
-  def hasRelationship(`type` : RelationshipType, dir: Direction) = throw new NotImplementedException
-
-  def getSingleRelationship(`type` : RelationshipType, dir: Direction) = throw new NotImplementedException
-
-  def createRelationshipTo(otherNode: Node, `type` : RelationshipType) = throw new NotImplementedException
-
-  def traverse(traversalOrder: Order, stopEvaluator: StopEvaluator, returnableEvaluator: ReturnableEvaluator, relationshipType: RelationshipType, direction: Direction) = throw new NotImplementedException
-
-  def traverse(traversalOrder: Order, stopEvaluator: StopEvaluator, returnableEvaluator: ReturnableEvaluator, firstRelationshipType: RelationshipType, firstDirection: Direction, secondRelationshipType: RelationshipType, secondDirection: Direction) = throw new NotImplementedException
-
-  def traverse(traversalOrder: Order, stopEvaluator: StopEvaluator, returnableEvaluator: ReturnableEvaluator, relationshipTypesAndDirections: Object*) = throw new NotImplementedException
-
-  def getGraphDatabase = throw new NotImplementedException
-
-  def hasProperty(key: String) = throw new NotImplementedException
-
-  def getProperty(key: String) = throw new NotImplementedException
-
-  def getProperty(key: String, defaultValue: AnyRef) = throw new NotImplementedException
-
-  def setProperty(key: String, value: AnyRef) {
-    throw new NotImplementedException
-  }
-
-  def removeProperty(key: String) = throw new NotImplementedException
-
-  def getPropertyKeys = throw new NotImplementedException
-
-  def getPropertyValues = throw new NotImplementedException
-}
-
-/**
- * this class exists because this class:
- * private static class org.neo4j.kernel.impl.batchinsert.RelationshipBatchImpl implements Relationship
- * is private. This is just a id container
- */
-class BatchRelationship(id: Long) extends Relationship {
-
-  /**
-   * id
-   */
-  def getId = id
-
-  def delete() {
-    throw new NotImplementedException
-  }
-
-  def getStartNode = throw new NotImplementedException
-
-  def getEndNode = throw new NotImplementedException
-
-  def getOtherNode(node: Node) = throw new NotImplementedException
-
-  def getNodes = throw new NotImplementedException
-
-  def getType = throw new NotImplementedException
-
-  def isType(`type` : RelationshipType) = throw new NotImplementedException
-
-  def getGraphDatabase = throw new NotImplementedException
-
-  def hasProperty(key: String) = throw new NotImplementedException
-
-  def getProperty(key: String) = throw new NotImplementedException
-
-  def getProperty(key: String, defaultValue: AnyRef) = throw new NotImplementedException
-
-  def setProperty(key: String, value: AnyRef) {
-    throw new NotImplementedException
-  }
-
-  def removeProperty(key: String) = throw new NotImplementedException
-
-  def getPropertyKeys = throw new NotImplementedException
-
-  def getPropertyValues = throw new NotImplementedException
-}
-
-/**
  * replica of the original ConstantScoreIterator which has package visibility
  * class org.neo4j.index.impl.lucene.ConstantScoreIterator<T> extends AbstractIndexHits<T>
  */
-class ConstantScoreIterator[T](i: Iterator[T], score: Float = Float.NaN) extends AbstractIndexHits[T] {
+class ConstantScoreIterator[T](items: List[T], score: Float = Float.NaN) extends AbstractIndexHits[T] {
 
-  private final val items = i //.iterator
   private final val _size: Int = items.size
+  private final val iter = items.iterator
 
-  def currentScore: Float = {
-    return score
-  }
+  def currentScore: Float = score
 
-  def size: Int = {
-    return _size
-  }
+  def size: Int = _size
 
-  protected def fetchNextOrNull: T = {
-    return if (items.hasNext) items.next else null.asInstanceOf[T]
-  }
+  protected def fetchNextOrNull: T =
+    if (iter.hasNext)
+      iter.next
+    else
+      null.asInstanceOf[T]
 }
