@@ -16,8 +16,8 @@ object CaseClassDeserializer {
   /**
    * Method Map cache for method serialize
    */
-  private val methodCache = new HashMap[AnyRef, Map[String, java.lang.reflect.Method]]()
-    with SynchronizedMap[AnyRef, Map[String, java.lang.reflect.Method]]
+  private val methodCache = new HashMap[Class[_], Map[String, java.lang.reflect.Method]]()
+    with SynchronizedMap[Class[_], Map[String, java.lang.reflect.Method]]
 
   /**
    * signature parser cache
@@ -66,7 +66,7 @@ object CaseClassDeserializer {
    * @param o AnyRef case class instance
    */
   def serialize(o: AnyRef): Map[String, AnyRef] = {
-    val methods = methodCache.getOrElseUpdate(o,
+    val methods = methodCache.getOrElseUpdate(o.getClass,
       o.getClass.getDeclaredMethods
         .filter {
         _.getParameterTypes.isEmpty
