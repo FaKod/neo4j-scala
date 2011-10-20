@@ -21,10 +21,18 @@ trait Neo4jBatchIndexProvider extends Neo4jIndexProvider {
    */
   def batchInserter: BatchInserter
 
+
+  private val batchIndexManager = new BatchIndexManager(batchInserter)
+
+  /**
+   * delegates to shutdown method
+   */
+  def shutdownIndex = batchIndexManager.shutdown
+
   /**
    * store for IndexManager
    */
-  override def getIndexManager: IndexManager = new BatchIndexManager(batchInserter)
+  override def getIndexManager: IndexManager = batchIndexManager
 
   /**
    * converts implicitly to the underlying batch instance
