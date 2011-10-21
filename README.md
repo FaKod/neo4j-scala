@@ -123,9 +123,45 @@ Traversing
 Besides, the neo4j scala binding makes it possible to write stop and returnable evaluators in a functional style :
 
     //StopEvaluator.END_OF_GRAPH, written in a Scala idiomatic way :
-    start.traverse(Traverser.Order.BREADTH_FIRST, (tp : TraversalPosition) => false, ReturnableEvaluator.ALL_BUT_START_NODE, "foo", Direction.OUTGOING)
+    start.traverse(Traverser.Order.BREADTH_FIRST, (tp : TraversalPosition) => false, 
+		ReturnableEvaluator.ALL_BUT_START_NODE, "foo", Direction.OUTGOING)
     
     //ReturnableEvaluator.ALL_BUT_START_NODE, written in a Scala idiomatic way :
-    start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), "foo", Direction.OUTGOING)
+    start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), 
+		"foo", Direction.OUTGOING)
 
+Batch Processing
+-----------------
+Neo4j has a batch insertion mode intended for initial imports, which must run in a single thread and bypasses transactions and other checks in favor of performance. See [Batch insertion](http://docs.neo4j.org/chunked/milestone/indexing-batchinsert.html).
 
+The Java interfaces are slightly different. I wrote some wrapper classes to support nearly transparent usage of batch node and batch relation insertion. Means same code for batch insertion and for normal non batch mode. Instead of using
+
+    class Builder extends Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with Neo4jIndexProvider {...}
+
+simply exchange the provider traits with
+
+    class Builder extends Neo4jWrapper with Neo4jBatchIndexProvider with BatchGraphDatabaseServiceProvider {...}
+
+getting the indexes is still the same code
+
+    val nodeIndex = getNodeIndex("NodeIndex").get
+	val relationIndex = getRelationIndex("RelationIndex").get
+	
+setting cache size:
+
+	nodeIndex.setCacheCapacity("NodeIndex", 1000000)
+	relationIndex.setCacheCapacity("RelationIndex", 1000000)
+	
+Nevertheless, indexes are not available till flushing. To flush call:
+
+    nodeIndex.flush
+	relationIndex.flush
+
+After insertion, the batch index manager and batch insertion manager have to be shut down
+
+    class Builder extends Neo4jWrapper . . .{
+	   . . .
+	   shutdownIndex
+	   shutdown(ds)
+	   . . .
+	}
