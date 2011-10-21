@@ -3,7 +3,6 @@ package org.neo4j.scala
 import org.neo4j.kernel.impl.batchinsert.BatchInserter
 import java.util.{Map => juMap}
 import org.neo4j.graphdb.index._
-import org.neo4j.graphdb.Traverser.Order
 import org.neo4j.graphdb._
 import org.neo4j.index.impl.lucene.{AbstractIndexHits, LuceneBatchInserterIndexProvider}
 import collection.JavaConversions._
