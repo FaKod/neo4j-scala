@@ -30,6 +30,18 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+        <repository>
+            <id>repo</id>
+            <url>file:///${basedir}/../fakod-mvn-repo/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot-repo</id>
+            <url>file:///${basedir}/../fakod-mvn-repo/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
     <repositories>
         <repository>
             <id>scala-tools.org</id>
@@ -40,6 +52,11 @@
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org</url>
         </repository>
+        <repository>
+            <id>fakod-snapshots</id>
+            <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
