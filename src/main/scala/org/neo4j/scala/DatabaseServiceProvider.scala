@@ -30,14 +30,24 @@ trait EmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider 
 }
 
 /**
+ * singleton EmbeddedGraphDatabase
+ */
+private[scala] object SingeltonProvider {
+  private var ds: Option[DatabaseService] = None
+
+  def apply(neo4jStoreDir: String) = ds match {
+    case Some(x) => x
+    case None =>
+      ds = Some(DatabaseServiceImpl(new EmbeddedGraphDatabase(neo4jStoreDir)))
+      ds.get
+  }
+}
+
+/**
  * provides a specific Database Service
  * in this case an singleton embedded database service
  */
 trait SingletonEmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider {
-
-  object Provider {
-    val ds: DatabaseService = DatabaseServiceImpl(new EmbeddedGraphDatabase(neo4jStoreDir))
-  }
 
   /**
    * directory where to store the data files
@@ -47,7 +57,23 @@ trait SingletonEmbeddedGraphDatabaseServiceProvider extends GraphDatabaseService
   /**
    * using an instance of an embedded graph database
    */
-  val ds: DatabaseService = Provider.ds
+  val ds: DatabaseService = SingeltonProvider(neo4jStoreDir)
+}
+
+/**
+ * singleton provider
+ */
+private[scala] object SingeltonBatchProvider {
+  private var inserter: Option[BatchInserter] = None
+
+  def apply(neo4jStoreDir: String) = inserter match {
+    case Some(x) => x
+    case None =>
+      inserter = Some(new BatchInserterImpl(neo4jStoreDir))
+      inserter.get
+  }
+
+  lazy val ds: DatabaseService = DatabaseServiceImpl(inserter.get.getGraphDbService)
 }
 
 /**
@@ -56,19 +82,11 @@ trait SingletonEmbeddedGraphDatabaseServiceProvider extends GraphDatabaseService
  */
 trait BatchGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider {
 
-  /**
-   * singleton provider
-   */
-  object Provider {
-    val inserter: BatchInserter = new BatchInserterImpl(neo4jStoreDir)
-
-    val ds: DatabaseService = DatabaseServiceImpl(inserter.getGraphDbService)
-  }
 
   /**
    * instance of BatchInserter
    */
-  def batchInserter = Provider.inserter
+  def batchInserter = SingeltonBatchProvider(neo4jStoreDir)
 
   /**
    * directory where to store the data files
@@ -78,5 +96,5 @@ trait BatchGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider {
   /**
    * using an instance of an embedded graph database
    */
-  val ds: DatabaseService = Provider.ds
+  val ds: DatabaseService = SingeltonBatchProvider.ds
 }
