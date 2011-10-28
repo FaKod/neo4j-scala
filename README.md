@@ -18,6 +18,23 @@ Building
     $ cd neo4j-scala
     $ mvn clean install
 
+Or try to maven fetch it with a Github Maven Repo:
+
+	    <repositories>
+	      <repository>
+	        <id>fakod-snapshots</id>
+	        <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
+	      </repository>
+	    </repositories>
+
+	    <dependencies>
+	      <dependency>
+	        <groupId>org.neo4j</groupId>
+	        <artifactId>neo4j-scala</artifactId>
+	        <version>0.1.0-SNAPSHOT</version>
+	      </dependency>
+	    </dependencies>
+
 Troubleshooting
 ---------------
 
