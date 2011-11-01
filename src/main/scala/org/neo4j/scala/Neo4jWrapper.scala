@@ -127,9 +127,11 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
 
   /**
    * serializes a given case class into a Node instance
+   * for null values not property will be set
    */
   def serialize[T <: PropertyContainer](cc: AnyRef, pc: PropertyContainer): T = {
     CaseClassDeserializer.serialize(cc).foreach {
+      case (name, null) =>
       case (name, value) => pc.setProperty(name, value)
     }
     pc(ClassPropertyName) = cc.getClass.getName

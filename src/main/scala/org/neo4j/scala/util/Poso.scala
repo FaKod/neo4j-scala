@@ -44,18 +44,20 @@ object CaseClassDeserializer {
 
     val values = new ArrayBuffer[AnyRef]
     for ((paramName, paramType) <- params) {
-      val field = m.getOrElse(paramName, throw new RuntimeException("Field: " + paramName + " of type: " + paramType.c + " not found"))
+      val field = m.getOrElse(paramName, null)
 
-      /**
-       * if the value is directly assignable: use it
-       * otherwise try to create an instance using der String Constructor
-       */
-      if (field.getClass.isAssignableFrom(paramType.c))
-        values += field
-      else {
-        val paramCtor = paramType.c.getConstructor(classOf[String])
-        val value = paramCtor.newInstance(field).asInstanceOf[AnyRef]
-        values += value
+      field match {
+        // use null if the property does not exist
+        case null =>
+          values += null
+        // if the value is directly assignable: use it
+        case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
+          values += x
+        // otherwise try to create an instance using der String Constructor
+        case x: AnyRef =>
+          val paramCtor = paramType.c.getConstructor(classOf[String])
+          val value = paramCtor.newInstance(x).asInstanceOf[AnyRef]
+          values += value
       }
     }
     constructor.newInstance(values.toArray: _*).asInstanceOf[AnyRef]

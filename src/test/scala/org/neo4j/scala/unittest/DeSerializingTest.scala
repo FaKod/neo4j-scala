@@ -14,7 +14,7 @@ import sys.ShutdownHookThread
 
 case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
-case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean)
+case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean, nullString: String = null)
 
 case class NotTest(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
@@ -97,13 +97,13 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
       val o = Test2(1, 3.3, true)
       withTx {
         implicit neo =>
-        val start = createNode
-        val end = createNode
-        end <-- "foo" <-- start < o
+          val start = createNode
+          val end = createNode
+          end <-- "foo" <-- start < o
 
-        val rel = start.getSingleRelationship("foo", Direction.OUTGOING)
-        val oo = rel.toCC[Test2]
-        oo must beEqualTo(Some(o))
+          val rel = start.getSingleRelationship("foo", Direction.OUTGOING)
+          val oo = rel.toCC[Test2]
+          oo must beEqualTo(Some(o))
       }
     }
   }
