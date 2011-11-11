@@ -7,6 +7,7 @@ import org.neo4j.graphdb._
 import org.neo4j.index.impl.lucene.{AbstractIndexHits, LuceneBatchInserterIndexProvider}
 import collection.JavaConversions._
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import collection.mutable.{SynchronizedMap, ConcurrentMap, HashMap}
 
 /**
  * provides Index access trait
@@ -91,11 +92,23 @@ class BatchIndexManager(bi: BatchInserter) extends IndexManager {
   def getRelationshipAutoIndexer = throw new NotImplementedException
 }
 
+private[scala] trait IndexCacheHelper {
+
+  private val cache = new HashMap[Long, HashMap[String, AnyRef]] with SynchronizedMap[Long, HashMap[String, AnyRef]]
+
+  /**
+   * caches multible values
+   */
+  protected def addToCache(id: Long, key: String, value: AnyRef) =
+    cache.getOrElseUpdate(id, HashMap[String, AnyRef]()) += ((key, value))
+
+  protected def cacheClear = cache.clear
+}
 
 /**
  * delegates Index[Node] methods to BatchInserterIndex methods
  */
-class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node] {
+class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node] with IndexCacheHelper {
 
   private val gds = bi.getGraphDbService
 
@@ -109,11 +122,19 @@ class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node]
 
   def updateOrAdd(entityId: Long, properties: Map[String, AnyRef]) = bii.updateOrAdd(entityId, properties)
 
-  def flush = bii.flush
+  def flush = {
+    cacheClear
+    bii.flush
+  }
 
   def setCacheCapacity(key: String, size: Int) = bii.setCacheCapacity(key, size)
 
-  def add(node: Node, key: String, value: AnyRef) = bii.add(node.getId, Map(key -> value))
+  /**
+   * uses the implementation that removes existing documents
+   * and replaces them with the cached ones
+   */
+  def add(node: Node, key: String, value: AnyRef) =
+    bii.updateOrAdd(node.getId, addToCache(node.getId, key, value))
 
   def get(key: String, value: AnyRef) = bii.get(key, value)
 
@@ -147,7 +168,7 @@ class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node]
 /**
  * delegates RelationshipIndex methods to BatchInserterIndex methods
  */
-class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends RelationshipIndex {
+class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends RelationshipIndex with IndexCacheHelper {
 
   private val gds = bi.getGraphDbService
 
@@ -161,11 +182,15 @@ class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends
 
   def updateOrAdd(entityId: Long, properties: Map[String, AnyRef]) = bii.updateOrAdd(entityId, properties)
 
-  def flush = bii.flush
+  def flush = {
+    cacheClear
+    bii.flush
+  }
 
   def setCacheCapacity(key: String, size: Int) = bii.setCacheCapacity(key, size)
 
-  def add(entity: Relationship, key: String, value: AnyRef) = bii.add(entity.getId, Map(key -> value))
+  def add(entity: Relationship, key: String, value: AnyRef) =
+    bii.updateOrAdd(entity.getId, addToCache(entity.getId, key, value))
 
   def get(key: String, value: AnyRef) = bii.get(key, value)
 
