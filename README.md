@@ -8,6 +8,9 @@ to be used in other Scala projects.
 This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project.
 
 
+
+See this [GIST](https://gist.github.com/1331556) for a usual Neo4j Matrix Example
+
 You may find [Neo4j-Spatial-Scala](http://github.com/FaKod/neo4j-spatial-scala) interesting as well.
 
 
