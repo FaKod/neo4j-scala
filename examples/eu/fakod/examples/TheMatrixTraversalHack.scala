@@ -82,13 +82,14 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
 
       val startNodes = nodeMap("Neo") :: nodeMap("Morpheus") :: nodeMap("Trinity") :: Nil
 
-      val erg = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->).sortWith(_.name < _.name)
-      println("Relations CODED_BY and KNOWS, sorted by name: " + erg)
+      val erg = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->) sortWith (_.name < _.name)
 
-      val erg2 = startNodes.start[Matrix](_.name.length > 3)(-- ("KNOWS") -->).map(_.name).foldLeft(0)(_ + _.length)
-      println("Relations KNOWS, length of all names: " + erg2)
+      val erg2 = startNodes.start[Matrix](_.name.length > 3)(--("KNOWS") -->).map(_.name).foldLeft(0)(_ + _.length)
 
       val erg3 = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->).map(_.name).foldLeft("")(_ + _)
+
+      println("Relations CODED_BY and KNOWS, sorted by name: " + erg)
+      println("Relations KNOWS, length of all names: " + erg2)
       println("Relations CODED_BY and KNOWS, all names appended: " + erg3)
   }
 
