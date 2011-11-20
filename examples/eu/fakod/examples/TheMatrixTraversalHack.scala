@@ -12,6 +12,8 @@ import collection.mutable.Buffer
  * http://wiki.neo4j.org/content/The_Matrix
  */
 
+case class Tp[T](dao: T, tp: TraversalPosition)
+
 object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
   ShutdownHookThread {
@@ -33,14 +35,43 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
 
   def BREADTH_FIRST = Order.BREADTH_FIRST
 
+  /**
+   *
+   */
   implicit def nodeListToTraversal(list: List[Node]) = new {
-    def start[T: Manifest](f: (T) => Boolean)(b: Buffer[Object]): List[T] = {
+    /**
+     *
+     */
+    def startTp[T: Manifest](stopEval: (Tp[T]) => Boolean)(retEval: (Tp[T]) => Boolean)(b: Buffer[Object]): List[T] = {
+      def args = b.toArray
+      val tmp = list.map {
+        n =>
+          n.traverse(BREADTH_FIRST,
+            (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
+              case Some(x) => stopEval(Tp(x, tp))
+              case None => false
+            },
+            (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
+              case Some(x) => retEval(Tp(x, tp))
+              case None => false
+            }, args: _*).getAllNodes
+      }
+
+      val nodes = (for (c <- tmp; n <- c) yield n).distinct
+
+      (for (n <- nodes; t <- n.toCC[T]) yield t).toList
+    }
+
+    /**
+     *
+     */
+    def start[T: Manifest](retEval: (T) => Boolean)(b: Buffer[Object]): List[T] = {
       def args = b.toArray
       val tmp = list.par.map {
         n =>
           n.traverse(BREADTH_FIRST, StopEvaluator.END_OF_GRAPH,
             (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
-              case Some(x) => f(x)
+              case Some(x) => retEval(x)
               case None => false
             }, args: _*).getAllNodes
       }
@@ -94,4 +125,30 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
   println("Relations KNOWS, length of all names: " + erg2)
   println("Relations CODED_BY and KNOWS, all names appended: " + erg3)
 
+
+  /**
+   * the following does not seem to be very convenient ;-) for FP newbies
+   * the question is: How do we get type safety through the stop and return evaluator?
+   * In case of the return evaluator its clear that we want to return only instances of Matrix
+   * the stop evaluator should work with all kinds of nodes - right? So this implementation is "wrong"
+   *
+   * maybe its better to define Tp like this
+   *    case class Tp(dao: AnyRef, tp: TraversalPosition)
+   * and to create the dao dynamically depending on the nodes "__CLASS__" property
+   *
+   * The stop evaluator could be written f. e. like
+   *
+   * {
+   *   case Matrix(name, _) => name.equalsIgnoreCase("Stop Here") // stop if name is "Stop Here"
+   *   case s:Something => true                                   // stop if node is of type Something
+   *   case _ => false                                            // default: don't stop
+   * }
+   */
+  val ergTp = startNodes.startTp[Matrix] {
+    case Tp(x, tp) => false
+  } {
+    case Tp(x, tp) => x.name.length > 3 && tp.depth == 2
+  }(--("CODED_BY") -- ("KNOWS") -->) sortWith (_.name < _.name)
+
+  println("Relations CODED_BY and KNOWS, sorted by name and depth == 2: " + ergTp)
 }
