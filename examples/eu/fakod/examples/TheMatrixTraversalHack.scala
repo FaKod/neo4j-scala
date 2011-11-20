@@ -36,7 +36,7 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
   implicit def nodeListToTraversal(list: List[Node]) = new {
     def start[T: Manifest](f: (T) => Boolean)(b: Buffer[Object]): List[T] = {
       def args = b.toArray
-      val tmp = list.map {
+      val tmp = list.par.map {
         n =>
           n.traverse(BREADTH_FIRST, StopEvaluator.END_OF_GRAPH,
             (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
@@ -44,9 +44,10 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
               case None => false
             }, args: _*).getAllNodes
       }
+
       val nodes = (for (c <- tmp; n <- c) yield n).distinct
 
-      (for (n <- nodes; t <- n.toCC[T]) yield t) toList
+      (for (n <- nodes; t <- n.toCC[T]) yield t).toList
     }
   }
 
@@ -68,7 +69,7 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
     }
   }
 
-  withTx {
+  val nodeMap = withTx {
     implicit neo =>
       val nodeMap = for ((name, prof) <- nodes) yield (name, createNode(Matrix(name, prof)))
 
@@ -78,19 +79,19 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
       nodeMap("Neo") --> "KNOWS" --> nodeMap("Morpheus") --> "KNOWS" --> nodeMap("Trinity")
       nodeMap("Morpheus") --> "KNOWS" --> nodeMap("Cypher") --> "KNOWS" --> nodeMap("Agent Smith")
       nodeMap("Agent Smith") --> "CODED_BY" --> nodeMap("The Architect")
-
-
-      val startNodes = nodeMap("Neo") :: nodeMap("Morpheus") :: nodeMap("Trinity") :: Nil
-
-      val erg = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->) sortWith (_.name < _.name)
-
-      val erg2 = startNodes.start[Matrix](_.name.length > 3)(--("KNOWS") -->).foldLeft(0)(_ + _.name.length)
-
-      val erg3 = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->).foldLeft("")(_ + _.name)
-
-      println("Relations CODED_BY and KNOWS, sorted by name: " + erg)
-      println("Relations KNOWS, length of all names: " + erg2)
-      println("Relations CODED_BY and KNOWS, all names appended: " + erg3)
+      nodeMap
   }
+
+  val startNodes = nodeMap("Neo") :: nodeMap("Morpheus") :: nodeMap("Trinity") :: Nil
+
+  val erg = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->) sortWith (_.name < _.name)
+
+  val erg2 = startNodes.start[Matrix](_.name.length > 3)(--("KNOWS") -->).foldLeft(0)(_ + _.name.length)
+
+  val erg3 = startNodes.start[Matrix](_.name.length > 3)(--("CODED_BY") -- ("KNOWS") -->).foldLeft("")(_ + _.name)
+
+  println("Relations CODED_BY and KNOWS, sorted by name: " + erg)
+  println("Relations KNOWS, length of all names: " + erg2)
+  println("Relations CODED_BY and KNOWS, all names appended: " + erg3)
 
 }
