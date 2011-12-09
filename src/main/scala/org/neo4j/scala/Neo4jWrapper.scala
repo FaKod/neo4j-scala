@@ -163,11 +163,9 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    * with T
    */
   def toCCPossible[T: Manifest](pc: PropertyContainer): Boolean =
-    pc[String](ClassPropertyName) match {
-      case Some(cpn) if (manifest[T].erasure.isAssignableFrom(Class.forName(cpn))) =>
-        true
-      case _ =>
-        false
+    _toCCPossible(pc) match {
+      case Some(_) => true
+      case _ => false
     }
 
   /**
