@@ -144,13 +144,19 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    * None if not
    */
   def toCC[T: Manifest](pc: PropertyContainer): Option[T] =
-    if (toCCPossible(pc)) {
-      val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
-      val o = deserialize[T](kv.toMap)
-      Some(o)
+    _toCCPossible(pc) match {
+      case Some(serializedClass) =>
+        val kv = for (k <- pc.getPropertyKeys; v = pc.getProperty(k)) yield (k -> v)
+        val o = deserialize[T](serializedClass, kv.toMap)
+        Some(o)
+      case _ => None
     }
-    else
-      None
+
+  private def _toCCPossible[T: Manifest](pc: PropertyContainer): Option[Class[_]] = {
+    for (cpn <- pc[String](ClassPropertyName); c = Class.forName(cpn) if (manifest[T].erasure.isAssignableFrom(c)))
+      return Some(c)
+    None
+  }
 
   /**
    * only checks if this property container has been serialized
@@ -158,7 +164,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
    */
   def toCCPossible[T: Manifest](pc: PropertyContainer): Boolean =
     pc[String](ClassPropertyName) match {
-      case Some(cpn) if (cpn.equals(manifest[T].erasure.getName)) =>
+      case Some(cpn) if (manifest[T].erasure.isAssignableFrom(Class.forName(cpn))) =>
         true
       case _ =>
         false

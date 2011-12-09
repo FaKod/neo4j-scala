@@ -26,13 +26,20 @@ object CaseClassDeserializer {
     with SynchronizedMap[Class[_], Seq[(String, JavaType)]]
 
   /**
+   * default behaviour for T == serialized class
+   */
+  def deserialize[T: Manifest](m: Map[String, AnyRef]): T =
+    deserialize[T](manifest[T].erasure, m)
+
+  /**
    * convenience method using class manifest
    * use it like <code>val test = deserialize[Test](myMap)<code>
    */
-  def deserialize[T: Manifest](m: Map[String, AnyRef]): T =
-    deserialize(m, JavaType(manifest[T].erasure)).asInstanceOf[T]
+  def deserialize[T: Manifest](serializedClass: Class[_], m: Map[String, AnyRef]): T =
+    deserialize(m, JavaType(serializedClass)).asInstanceOf[T]
 
-  /**Creates a case class instance from parameter map
+  /**
+   * Creates a case class instance from parameter map
    *
    * @param m Map[String, AnyRef] map of parameter name an parameter type
    * @param javaTypeTarget JavaType case class class to create
