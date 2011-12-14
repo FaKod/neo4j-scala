@@ -18,6 +18,12 @@ case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean
 
 case class NotTest(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
+trait PolyBase
+
+case class Poly1(s: String) extends PolyBase
+
+case class Poly2(s: String) extends PolyBase
+
 import CaseClassDeserializer._
 
 class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
@@ -105,6 +111,26 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
           val oo = rel.toCC[Test2]
           oo must beEqualTo(Some(o))
       }
+    }
+
+    "be possible to do polymorphic case classes" in {
+      val n1 = withTx {
+        createNode(Poly1("Poly1"))(_)
+      }
+      val n2 = withTx {
+        createNode(Poly2("Poly2"))(_)
+      }
+
+      n1.toCC[PolyBase].get match {
+        case p1: Poly1 => println(p1)
+        case _ => failure
+      }
+
+      n2.toCC[PolyBase].get match {
+        case p2: Poly2 => println(p2)
+        case _ => failure
+      }
+      success
     }
   }
 }
