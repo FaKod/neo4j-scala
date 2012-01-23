@@ -10,7 +10,14 @@ import org.neo4j.graphdb._
  * The Matrix Example
  * http://wiki.neo4j.org/content/The_Matrix
  */
-case class Matrix(name: String, profession: String)
+trait MatrixBase {
+  val name: String
+  val profession: String
+}
+
+case class Matrix(name: String, profession: String) extends MatrixBase
+
+case class NonMatrix(name: String, profession: String) extends MatrixBase
 
 object TheMatrix extends App with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
@@ -76,12 +83,12 @@ object TheMatrix extends App with Neo4jWrapper with EmbeddedGraphDatabaseService
         DynamicRelationshipType.withName("KNOWS"),
         Direction.OUTGOING)
 
-        traverser.foreach {
+      traverser.foreach {
         n =>
           n.toCC[Matrix] match {
             case None => println("not a Matrix Case Class")
             case Some(Matrix(name, prof)) =>
-              println("At depth " +traverser.currentPosition.depth + " Name: " + name + " Profession: " + prof)
+              println("At depth " + traverser.currentPosition.depth + " Name: " + name + " Profession: " + prof)
           }
       }
   }

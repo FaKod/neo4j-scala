@@ -14,6 +14,7 @@ import collection.mutable.Buffer
 
 case class Tp[T](dao: T, tp: TraversalPosition)
 
+
 object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
   ShutdownHookThread {
@@ -35,10 +36,56 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
 
   def BREADTH_FIRST = Order.BREADTH_FIRST
 
+
   /**
    *
    */
   implicit def nodeListToTraversal(list: List[Node]) = new {
+
+    //    def startTp2[T: Manifest](b: Buffer[Object])(stopEval: (T, TraversalPosition) => Boolean)(retEval: (T, TraversalPosition) => Boolean)(f: (List[T]) => Unit): Unit = {
+    //      def args = b.toArray
+    //
+    //      val tmp = list.par.map {
+    //        n =>
+    //          n.traverse(BREADTH_FIRST,
+    //            (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
+    //              case Some(x) => stopEval(x, tp)
+    //              case None => false
+    //            },
+    //            (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
+    //              case Some(x) => retEval(x, tp)
+    //              case None => false
+    //            }, args: _*).getAllNodes
+    //      }
+    //
+    //      val nodes = (for (c <- tmp; n <- c) yield n).distinct
+    //
+    //      val ergList = (for (n <- nodes; t <- n.toCC[T]) yield t).toList
+    //      f(ergList)
+    //    }
+
+    def startTp2[T: Manifest](b: Buffer[Object])(stopEval: PartialFunction[(T, TraversalPosition), Boolean])(retEval: PartialFunction[(T, TraversalPosition), Boolean])(f: (List[T]) => Unit): Unit = {
+      def args = b.toArray
+
+      val tmp = list.par.map {
+        n =>
+          n.traverse(BREADTH_FIRST,
+            (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
+              case Some(x) if (stopEval.isDefinedAt(x, tp)) => stopEval(x, tp)
+              case _ => false
+            },
+            (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
+              case Some(x) if (retEval.isDefinedAt(x, tp)) => retEval(x, tp)
+              case _ => false
+            }, args: _*).getAllNodes
+      }
+
+      val nodes = (for (c <- tmp; n <- c) yield n).distinct
+
+      val ergList = (for (n <- nodes; t <- n.toCC[T]) yield t).toList
+      f(ergList)
+    }
+
     /**
      *
      */
@@ -151,4 +198,35 @@ object TheMatrix2 extends App with Neo4jWrapper with EmbeddedGraphDatabaseServic
   }(--("CODED_BY") -- ("KNOWS") -->) sortWith (_.name < _.name)
 
   println("Relations CODED_BY and KNOWS, sorted by name and depth == 2: " + ergTp)
+
+
+  val startWithNodes = nodeMap("Neo") :: nodeMap("Morpheus") :: nodeMap("Trinity") :: Nil
+
+
+  startWithNodes.startTp2[MatrixBase](--("KNOWS") -- ("CODED_BY") -->) {
+    case _ => false
+  } {
+    case (x: Matrix, tp) if (tp.depth > 0) => x.name.length > 2
+    case (x: NonMatrix, _) => false
+    case _ => false
+  } {
+    result =>
+      val erg = result.sortWith(_.name < _.name)
+      println("Relations CODED_BY and KNOWS, sorted by name and depth == 2: " + erg)
+  }
+
+
+  startWithNodes.startTp2[MatrixBase](--("KNOWS") -- ("CODED_BY") -->) {
+    case _ => false
+  } {
+    case (x: Matrix, tp) if (tp.depth > 0) => x.name.length > 2
+    case (x: NonMatrix, _) => false
+    case _ => false
+  } {
+    result =>
+      val erg = result.sortWith(_.name < _.name)
+      println("Relations CODED_BY and KNOWS, sorted by name and depth == 2: " + erg)
+  }
+
+
 }
