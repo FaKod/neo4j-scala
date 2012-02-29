@@ -102,6 +102,13 @@
             <artifactId>neo4j-shell</artifactId>
             <version>${neo4j.shell.version}</version>
         </dependency>
+
+        <!-- REST Binding -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-rest-graphdb</artifactId>
+            <version>${neo4j.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
