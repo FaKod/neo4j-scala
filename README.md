@@ -63,6 +63,7 @@ Available are:
 * EmbeddedGraphDatabaseServiceProvider
 * SingletonEmbeddedGraphDatabaseServiceProvider (singleton version)
 * BatchGraphDatabaseServiceProvider (use it with Neo4jBatchIndexProvider)
+* RestGraphDatabaseServiceProvider uses the REST binding (0.2.0-SNAPSHOT only)
 
 ##Transaction Wrapping
 
