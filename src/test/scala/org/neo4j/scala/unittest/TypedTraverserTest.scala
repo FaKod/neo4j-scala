@@ -2,16 +2,7 @@ package org.neo4j.scala.unittest
 
 import org.specs2.mutable.SpecificationWithJUnit
 import sys.ShutdownHookThread
-import org.neo4j.scala.{SingletonEmbeddedGraphDatabaseServiceProvider, TypedTraverser, Neo4jWrapper}
-
-trait Test_MatrixBase {
-  val name: String
-  val profession: String
-}
-
-case class Test_Matrix(name: String, profession: String) extends Test_MatrixBase
-
-case class Test_NonMatrix(name: String, profession: String) extends Test_MatrixBase
+import org.neo4j.scala._
 
 class TypedTraverserSpec extends SpecificationWithJUnit with Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with TypedTraverser {
 
