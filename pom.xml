@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-rest-graphdb</artifactId>
-            <version>${neo4j.version}</version>
+            <version>${neo4j.version}-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
