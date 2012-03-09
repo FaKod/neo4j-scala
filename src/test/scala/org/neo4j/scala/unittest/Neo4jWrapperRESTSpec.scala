@@ -145,7 +145,7 @@ class Neo4jWrapperRESTSpec extends SpecificationWithJUnit with Neo4jWrapper with
 
     // No Traverser for Now
 
-    /*"allow writing stop evaluators in a functional style" in {
+    "allow writing stop evaluators in a functional style" in {
       withTx {
         implicit neo =>
           val start = createNode
@@ -167,6 +167,6 @@ class Neo4jWrapperRESTSpec extends SpecificationWithJUnit with Neo4jWrapper with
           traverser.iterator.hasNext must beEqualTo(true)
           traverser.iterator.next must beEqualTo(end)
       }
-    }*/
+    }
   }
 }
