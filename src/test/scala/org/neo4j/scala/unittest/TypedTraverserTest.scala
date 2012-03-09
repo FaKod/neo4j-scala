@@ -33,7 +33,7 @@ class TypedTraverserSpec extends SpecificationWithJUnit with Neo4jWrapper with S
       nodeMap
   }
 
-  val startNodes = nodeMap("Neo") :: nodeMap("Morpheus") :: nodeMap("Trinity") :: Nil
+  val startNodes = nodeMap("Neo") :: Nil//nodeMap("Morpheus") :: nodeMap("Trinity") :: Nil
 
   "TypedTraverser" should {
 
