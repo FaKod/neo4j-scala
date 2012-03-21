@@ -6,7 +6,7 @@
     <artifactId>neo4j-scala</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <description>Scala wrapper for Neo4j Graph Database</description>
     <url>http://github.com/fakod/neo4j-scala</url>
     <inceptionYear>2011</inceptionYear>
@@ -43,11 +43,6 @@
 
 
     <repositories>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-Tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
         <repository>
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org</url>
