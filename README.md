@@ -25,8 +25,8 @@ Or try to maven fetch it with a Github Maven Repo:
 
 	    <repositories>
 	      <repository>
-	        <id>fakod-snapshots</id>
-	        <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
+	        <id>fakod-releases</id>
+	        <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/releases</url>
 	      </repository>
 	    </repositories>
 
@@ -34,7 +34,7 @@ Or try to maven fetch it with a Github Maven Repo:
 	      <dependency>
 	        <groupId>org.neo4j</groupId>
 	        <artifactId>neo4j-scala</artifactId>
-	        <version>0.1.0-SNAPSHOT</version>
+	        <version>0.1.0</version>
 	      </dependency>
 	    </dependencies>
 
