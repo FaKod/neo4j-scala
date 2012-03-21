@@ -19,6 +19,9 @@
     <profiles>
         <profile>
             <id>Neo4j 1.5</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
             <neo4j.version>1.5</neo4j.version>
             <neo4j.shell.version>1.5</neo4j.shell.version>
