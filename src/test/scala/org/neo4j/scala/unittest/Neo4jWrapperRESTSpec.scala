@@ -143,29 +143,17 @@ class Neo4jWrapperRESTSpec extends SpecificationWithJUnit with Neo4jWrapper with
       }
     }
 
-    // No Traverser for Now
+    // No Old Style Traverser for Now
 
-    "allow writing stop evaluators in a functional style" in {
+    "throw a UnsupportedOperationException using the old traverser" in {
       withTx {
         implicit neo =>
           val start = createNode
-          val end = createNode
-          val rel = start.createRelationshipTo(end, DynamicRelationshipType.withName("foo"))
-          val traverser = start.traverse(Traverser.Order.BREADTH_FIRST, (tp: TraversalPosition) => false, ReturnableEvaluator.ALL_BUT_START_NODE, DynamicRelationshipType.withName("foo"), Direction.OUTGOING)
-          traverser.iterator.hasNext must beEqualTo(true)
-          traverser.iterator.next must beEqualTo(end)
-      }
-    }
+          start.traverse(Traverser.Order.BREADTH_FIRST, (tp: TraversalPosition) => false,
+            ReturnableEvaluator.ALL_BUT_START_NODE,
+            DynamicRelationshipType.withName("foo"),
+            Direction.OUTGOING) must throwA[UnsupportedOperationException]
 
-    "allow writing returnable evaluators in a functional style" in {
-      withTx {
-        implicit neo =>
-          val start = createNode
-          val end = createNode
-          val rel = start.createRelationshipTo(end, DynamicRelationshipType.withName("foo"))
-          val traverser = start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp: TraversalPosition) => tp.notStartNode(), DynamicRelationshipType.withName("foo"), Direction.OUTGOING)
-          traverser.iterator.hasNext must beEqualTo(true)
-          traverser.iterator.next must beEqualTo(end)
       }
     }
   }

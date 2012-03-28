@@ -6,7 +6,7 @@
     <artifactId>neo4j-scala</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.0.0.2.0-SNAPSHOT</version>
     <description>Scala wrapper for Neo4j Graph Database</description>
     <url>http://github.com/fakod/neo4j-scala</url>
     <inceptionYear>2011</inceptionYear>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-rest-graphdb</artifactId>
-            <version>${neo4j.version}-SNAPSHOT</version>
+            <version>0.0.1.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

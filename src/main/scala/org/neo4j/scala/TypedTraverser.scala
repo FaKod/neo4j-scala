@@ -4,10 +4,12 @@ import org.neo4j.graphdb.Traverser.Order
 import collection.mutable.Buffer
 import org.neo4j.graphdb.{TraversalPosition, Direction, DynamicRelationshipType, Node}
 
+
 /**
- * Trait for a Typed Traversal API
+ * Basics for Typed Traverser
  */
-trait TypedTraverser {
+trait TypedTraverserBase {
+
   self: Neo4jWrapper =>
 
   /**
@@ -78,6 +80,25 @@ trait TypedTraverser {
   }
 
   /**
+   * shortens Order.BREADTH_FIRST
+   */
+  final val BREADTH_FIRST = Order.BREADTH_FIRST
+
+  /**
+   * shortens Order.DEPTH_FIRST
+   */
+  final val DEPTH_FIRST = Order.DEPTH_FIRST
+}
+
+
+
+/**
+ * Trait for a Typed Traversal API
+ */
+trait TypedTraverser extends TypedTraverserBase {
+  self: Neo4jWrapper =>
+
+  /**
    * END_OF_GRAPH Stop Evaluator
    * stops at end of graph only
    */
@@ -101,15 +122,6 @@ trait TypedTraverser {
     case (_, tp) => tp.notStartNode
   }
 
-  /**
-   * shortens Order.BREADTH_FIRST
-   */
-  final val BREADTH_FIRST = Order.BREADTH_FIRST
-
-  /**
-   * shortens Order.DEPTH_FIRST
-   */
-  final val DEPTH_FIRST = Order.DEPTH_FIRST
 
   /**
    * Enhances a Node with a doTraverse method

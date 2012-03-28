@@ -6,7 +6,7 @@ import sys.ShutdownHookThread
 import org.neo4j.scala._
 
 
-class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper with RestGraphDatabaseServiceProvider with TypedTraverser {
+class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper with RestGraphDatabaseServiceProvider with RestTypedTraverser {
 
   def uri = new URI("http://localhost:7474/db/data/")
 
@@ -41,7 +41,7 @@ class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper wi
 
     "be able to traverse a List of Nodes" in {
       val erg = startNodes.doTraverse[Test_MatrixBase](follow -- "KNOWS" ->- "CODED_BY") {
-        case _ => false
+        PruneEvaluator("false")
       } {
         case (x: Test_Matrix, tp) if (tp.depth == 3) => x.name.length > 2
         case (x: Test_NonMatrix, _) => false
@@ -51,9 +51,10 @@ class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper wi
       erg.length must be_==(2)
     }
 
-    "be able to traverse one Node" in {
+
+    "be able to traverse one Node with JS Prune Evaluator" in {
       val erg = nodeMap("Neo").doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
-        END_OF_GRAPH
+        "position.length() > 100;"
       } {
         case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
         case (x: Test_NonMatrix, _) => false
@@ -61,6 +62,36 @@ class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper wi
 
       erg must contain(Test_Matrix("Cypher", "Hacker"))
       erg.length must be_==(1)
+    }
+
+
+    "be able to traverse one Node with Max Depth 100" in {
+      val erg = nodeMap("Neo").doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY")(100) {
+        case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+      }.toList.sortWith(_.name < _.name)
+
+      erg must contain(Test_Matrix("Cypher", "Hacker"))
+      erg.length must be_==(1)
+    }
+
+
+    "be able to traverse with builtin filter \"ReturnAllButStartNode\" with Max Depth 1" in {
+      val erg = nodeMap("Neo").
+        doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY", 1, ReturnAllButStartNode).
+        toList.sortWith(_.name < _.name)
+
+      erg must contain(Test_Matrix("Morpheus", "Hacker"), Test_Matrix("Trinity", "Hacker"))
+      erg.length must be_==(2)
+    }
+
+
+    "be able to traverse with JS Filter \"true\" with Max Depth 1" in {
+      val erg = nodeMap("Neo").
+        doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY", 1, "true").
+        toList.sortWith(_.name < _.name)
+
+      erg must contain(Test_Matrix("Neo", "Hacker"),Test_Matrix("Morpheus", "Hacker"), Test_Matrix("Trinity", "Hacker"))
+      erg.length must be_==(3)
     }
   }
 }
