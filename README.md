@@ -230,6 +230,56 @@ Instead of one Node you can use a List of Nodes (List[Node]). The given traverse
 
 Where startWithNodes is of type List[Node].
 
+##REST Typed Traversing 
+* only Version 0.0.0.2.0-SNAPSHOT for neo4j-scala
+* only Version 0.0.1.5-SNAPSHOT for neo4j-rest-graphdb (FaKods fork with few modifications)
+
+###Prune Evaluator and Max Depth
+The **PruneEvaluator** defines where to stop traversing relations. It has to be Java Script code that can use the position instance of type org.neo4j.graphdb.Path.
+ 
+**max depth** is a short-hand way of specifying a prune evaluator which prunes after a certain depth. If not specified a max depth of 1 is used and if a "prune evaluator" is specified instead of a max depth, no max depth limit is set.
+
+####Examples
+Using the case class PruneEvaluator ("JAVASCRIPT" is dafault):
+
+      startNodes.doTraverse[…](…) {
+        PruneEvaluator("false", JAVASCRIPT)
+      } {
+        … 
+      }
+      
+Using a String (implicit conversion involved)
+
+	  startNodes.doTraverse[…](…) {
+        "position.length() > 100;"
+      } {
+        ..Return Filter/Evaluator.. 
+      }
+      
+Using Max Depth
+
+	  startNodes.doTraverse[…](…) (100) {
+        ..Return Filter/Evaluator.. 
+      }
+      
+###Return Filter
+The Return Filter has the same semantic than the Return Evaluator. It can be used as with the normal TypedTraverser, can be used with the Java Script and with two builtin functions:
+
+* ReturnAllButStartNode
+* ReturnAll
+
+####Examples
+Traversing with Max Depth 10 and all nodes except start node:
+
+	nodeMap("Neo").
+        doTraverse[…](follow(BREADTH_FIRST) -- "KNOWS", 10, ReturnAllButStartNode)
+
+Using Java Script ("true"):
+
+	nodeMap("Neo").
+        doTraverse[…](follow(BREADTH_FIRST) ->- "CODED_BY", 1, "true")
+
+
 
 ##Batch Processing
 
