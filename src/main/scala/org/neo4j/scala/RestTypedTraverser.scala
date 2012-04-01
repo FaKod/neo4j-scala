@@ -18,10 +18,12 @@ trait RestTypedTraverser extends TypedTraverserBase {
   import ScriptLanguage._
 
   /**
-   * Prune Evaluator in a certain language to be used server side. F.e.
+   * Prune Evaluator in a certain language to be used server side.
+   * F.e.
    * <code>
-   *   position.endNode().getProperty('date')>1234567;
+   * position.endNode().getProperty('date')>1234567;
    * </code>
+   * position is of type @see org.neo4j.graphdb.Path
    *
    * @param body String the code
    * @param language String defaults to Java Script
@@ -61,6 +63,37 @@ trait RestTypedTraverser extends TypedTraverserBase {
   val ReturnAllButStartNode = ReturnFilter("all_but_start_node", BUILTIN)
 
 
+  /**
+   * helper class for creating Java Script code
+   * @param js String Java Script code to prepend
+   */
+  class JavaScriptForReturnFilter(val js: String) {
+    def instanceof[T: Manifest] = js + isOfCaseClass_JS[T]
+  }
+
+  /**
+   * <code>
+   * ReturnFilter("position.endNode()" + isOfCaseClass_JS[Matrix])
+   * </code>
+   *
+   * @tparam T type of case class to check
+   * @return String Java Script code snippet to be used for ReturnFilter or PruneEvaluator
+   */
+  def isOfCaseClass_JS[T: Manifest] =
+    ".getProperty('" + Neo4jWrapper.ClassPropertyName + "')==\"" + manifest[T].erasure.getName + "\";"
+
+  /**
+   * creates Java Script code for server side startNode type test
+   * @return String JS code
+   */
+  def startNode = new JavaScriptForReturnFilter("position.startNode()")
+
+  /**
+   * creates Java Script code for server side endNode type test
+   * @return String JS code
+   */
+  def endNode = new JavaScriptForReturnFilter("position.endNode()")
+
 
   /**
    * Enhances a Node with a doTraverse method
@@ -75,10 +108,10 @@ trait RestTypedTraverser extends TypedTraverserBase {
      *
      * <pre><code>
      * myNode.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
-     *   PruneEvaluator("position.length() > 100;")
+     * PruneEvaluator("position.length() > 100;")
      * } {
-     *  case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
-     *  case (x: NonMatrix, _) => false
+     * case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+     * case (x: NonMatrix, _) => false
      * }.toList.sortWith(_.name < _.name)
      * </code></pre>
      *
@@ -155,10 +188,10 @@ trait RestTypedTraverser extends TypedTraverserBase {
      *
      * <pre><code>
      * myListOfNodes.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
-     *   "position.length() > 100;"
+     * "position.length() > 100;"
      * } {
-     *  case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
-     *  case (x: NonMatrix, _) => false
+     * case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+     * case (x: NonMatrix, _) => false
      * }.toList.sortWith(_.name < _.name)
      * </code></pre>
      *
