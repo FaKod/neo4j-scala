@@ -160,6 +160,12 @@ class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node]
     throw new NotImplementedException
   }
 
+  def putIfAbsent(entity: Node, key: String, value: AnyRef): Node = {
+    throw new NotImplementedException
+  }
+
+  def getGraphDatabase: GraphDatabaseService = gds
+
   def getName = throw new NotImplementedException
 
   def getEntityType = throw new NotImplementedException
@@ -215,6 +221,12 @@ class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends
   def delete() {
     throw new NotImplementedException
   }
+
+  def putIfAbsent(entity: Relationship, key: String, value: AnyRef): Relationship = {
+    throw new NotImplementedException
+  }
+
+  def getGraphDatabase: GraphDatabaseService = gds
 
   def getName = throw new NotImplementedException
 

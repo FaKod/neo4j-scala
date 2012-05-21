@@ -14,9 +14,29 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.9.1</scala.version>
-        <neo4j.version>1.7</neo4j.version>
-        <neo4j.shell.version>1.5</neo4j.shell.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>Neo4j 1.5</id>
+            <properties>
+            <neo4j.version>1.5</neo4j.version>
+            <neo4j.shell.version>1.5</neo4j.shell.version>
+            <neo4j.rest.version>1.5</neo4j.rest.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>Neo4j 1.7</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <neo4j.version>1.7</neo4j.version>
+                <neo4j.shell.version>1.7</neo4j.shell.version>
+                <neo4j.rest.version>1.8-SNAPSHOT</neo4j.rest.version>
+            </properties>
+        </profile>
+    </profiles>
 
     <developers>
         <developer>
@@ -43,11 +63,6 @@
 
 
     <repositories>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-Tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
         <repository>
             <id>neo4j-public-repository</id>
             <url>http://m2.neo4j.org</url>
@@ -107,7 +122,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-rest-graphdb</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>${neo4j.rest.version}</version>
         </dependency>
     </dependencies>
 
@@ -159,7 +174,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.9</version>
                 <configuration>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <testFailureIgnore>false</testFailureIgnore>
                     <includes>
                         <include>**/unittest/*.java</include>
                     </includes>
