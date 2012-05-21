@@ -63,10 +63,12 @@ Neo4j Scala Wrapper needs a Graph Database Service Provider, it has to implement
 One possibility is to use the EmbeddedGraphDatabaseServiceProvider for embedded Neo4j instances where you simply have to define a Neo4j storage directory.
 The class MyNeo4jClass using the wrapper is f.e.:
 
+```scala
     class MyNeo4jClass extends SomethingClass with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
       def neo4jStoreDir = "/tmp/temp-neo-test"
       . . .
     }
+```
 
 Available are:
 
@@ -79,31 +81,39 @@ Available are:
 
 Transactions are wrapped by withTx. After leaving the "scope" success is called (or rollback if an exception is raised):
 
+```scala
     withTx {
      implicit neo =>
        val start = createNode
        val end = createNode
        start --> "foo" --> end
     }
+```
 
 ##Using an Index
 
 Neo4j provides indexes for nodes and relationships. The indexes can be configured by mixing in the Neo4jIndexProvider trait. See [Indexing](http://docs.neo4j.org/chunked/stable/indexing.html)
 
+```scala
     class MyNeo4jClass extends . . . with Neo4jIndexProvider {
       // configuration for the index being created.
       override def NodeIndexConfig = ("MyTest1stIndex", Map("provider" -> "lucene", "type" -> "fulltext")) ::
                                      ("MyTest2ndIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
     }
+```
 
 Use one of the configured indexes with
 
+```scala
     val nodeIndex = getNodeIndex("MyTest1stIndex").get
+```
 
 Add and remove entries by:
 
+```scala
     nodeIndex += (Node_A, "title", "The Matrix")
     nodeIndex -= (Node_A)
+```
 
 ##Relations
 
@@ -111,17 +121,22 @@ Add and remove entries by:
 Using this wrapper, this is how creating two relationships can look in Scala. 
 The String are automatically converted into Dynamic Relationsships:
 
+```scala
     start --> "KNOWS" --> intermediary --> "KNOWS" --> end
     left --> "foo" --> middle <-- "bar" <-- right
+```
 
 To return the Property Container for the Relation Object use the '<' method:
 
+```scala
     val relation = start --> "KNOWS" --> end <
+```
 
 ##Properties
 
 And this is how getting and setting properties on a node or relationship looks like :
 
+```scala
     // setting the property foo
     start("foo") = "bar"
     // cast Object to String and match . . .
@@ -129,6 +144,7 @@ And this is how getting and setting properties on a node or relationship looks l
     	case Some(x) => println(x)
 	    case None => println("aww")
     }
+```
 
 ##Using Case Classes
 
