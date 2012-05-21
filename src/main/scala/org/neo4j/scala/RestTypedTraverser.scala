@@ -68,7 +68,7 @@ trait RestTypedTraverser extends TypedTraverserBase {
    * @param js String Java Script code to prepend
    */
   class JavaScriptForReturnFilter(val js: String) {
-    def instanceof[T: Manifest] = js + isOfCaseClass_JS[T]
+    def isOfType[T: Manifest] = js + isOfCaseClass_JS[T]
   }
 
   /**

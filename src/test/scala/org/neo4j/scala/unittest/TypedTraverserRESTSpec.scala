@@ -131,7 +131,7 @@ class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper wi
        * server side type check with endNode.isOfType[Test_Matrix] that created Java Script code
        */
       val erg = nodeMap("Neo").doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY", 1,
-        endNode.instanceof[Test_Matrix]
+        endNode.isOfType[Test_Matrix]
       ).toList.sortWith(_.name < _.name)
 
       erg must contain(Test_Matrix("Neo", "Hacker"), Test_Matrix("Morpheus", "Hacker"), Test_Matrix("Trinity", "Hacker"))
@@ -145,7 +145,7 @@ class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper wi
        */
       val erg = nodeMap("Neo").doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY",
         "position.length() >= 1",
-        endNode.instanceof[Test_Matrix]
+        endNode.isOfType[Test_Matrix]
       ).toList.sortWith(_.name < _.name)
 
       erg must contain(Test_Matrix("Neo", "Hacker"), Test_Matrix("Morpheus", "Hacker"), Test_Matrix("Trinity", "Hacker"))
