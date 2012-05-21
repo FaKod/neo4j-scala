@@ -28,9 +28,9 @@ Or try to maven fetch it with a Github Maven Repo:
     <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
   </repository>
   <repository>
-          <id>fakod-releases</id>
-          <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/releases</url>
-         </repository>
+    <id>fakod-releases</id>
+    <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/releases</url>
+  </repository>
 </repositories>
 
 <dependencies>
