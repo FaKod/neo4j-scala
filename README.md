@@ -44,6 +44,14 @@ Or try to maven fetch it with a Github Maven Repo:
 
 Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scala/issues) to submit bug reports or feature requests.
 
+#Versions
+
+##0.2.0-SNAPSHOT
+
+* Switched to Neo4j Version 1.7
+* Introducing Typed Traverser for type safe traversals
+* Added REST Graph DB Provider to support REST based server access
+* Introducing REST Typed Traverser with support for server side Prune Evaluator and Return Filter
 
 #Using this library
 
@@ -63,7 +71,7 @@ Available are:
 * EmbeddedGraphDatabaseServiceProvider
 * SingletonEmbeddedGraphDatabaseServiceProvider (singleton version)
 * BatchGraphDatabaseServiceProvider (use it with Neo4jBatchIndexProvider)
-* RestGraphDatabaseServiceProvider uses the REST binding (0.2.0-SNAPSHOT only)
+* RestGraphDatabaseServiceProvider uses the REST binding
 
 ##Transaction Wrapping
 
@@ -157,7 +165,7 @@ Besides, the neo4j scala binding makes it possible to write stop and returnable 
     start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), 
 		"foo", Direction.OUTGOING)
 
-##Typed Traversing (only Version 0.2.0-SNAPSHOT)
+##Typed Traversing
 
 The traverser mentioned above processes and returns Nodes resp. Property Container. To allow a more type safe traverser the TypedTraverser was introduced. The basic semantic is that you have to define the type (a case class) that should be returned (while inheritance is respected).
 But first define Relation Types and Directions:
@@ -230,55 +238,77 @@ Instead of one Node you can use a List of Nodes (List[Node]). The given traverse
 
 Where startWithNodes is of type List[Node].
 
+
 ##REST Typed Traversing 
-* only Version 0.0.0.2.0-SNAPSHOT for neo4j-scala
-* only Version 0.0.1.5-SNAPSHOT for neo4j-rest-graphdb (FaKods fork with few modifications)
+* Only working with version 1.8-SNAPSHOT of **neo4j-rest-graphdb**
+
+The main diffenrence between the non REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
+
 
 ###Prune Evaluator and Max Depth
+
 The **PruneEvaluator** defines where to stop traversing relations. It has to be Java Script code that can use the position instance of type org.neo4j.graphdb.Path.
  
-**max depth** is a short-hand way of specifying a prune evaluator which prunes after a certain depth. If not specified a max depth of 1 is used and if a "prune evaluator" is specified instead of a max depth, no max depth limit is set.
+**max depth** is a short-hand way of specifying a prune evaluator which prunes after a certain depth. If not specified
 
-####Examples
-Using the case class PruneEvaluator ("JAVASCRIPT" is dafault):
+* a max depth of 1 is used and 
+* if a "prune evaluator" is specified instead of a max depth, no max depth limit is set.
 
-      startNodes.doTraverse[…](…) {
-        PruneEvaluator("false", JAVASCRIPT)
-      } {
-        … 
-      }
+####Examples for Prune Evaluator / MaxDepth
+Using the case class PruneEvaluator ("JAVASCRIPT" is dafault, "false" is Java Script code):
       
-Using a String (implicit conversion involved)
-
-	  startNodes.doTraverse[…](…) {
+      startNode.doTraverse[Test_MatrixBase](follow -- "KNOWS" ->- "CODED_BY") {
+        PruneEvaluator("false")
+      } {
+        case (x: Test_Matrix, tp) if (tp.depth == 3) => x.name.length > 2
+        case (x: Test_NonMatrix, _) => false
+      }.toList.sortWith(_.name < _.name)
+      
+Using a Java Script prune evaluator as a String (implicit conversion involved)
+      
+      startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
         "position.length() > 100;"
       } {
-        ..Return Filter/Evaluator.. 
-      }
+        case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+        case (x: Test_NonMatrix, _) => false
+      }.toList.sortWith(_.name < _.name)
       
-Using Max Depth
+Using MaxDepth 100:
 
-	  startNodes.doTraverse[…](…) (100) {
-        ..Return Filter/Evaluator.. 
-      }
+      startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY")(100) {
+        case (x: Test_Matrix, _) => x.name.length > 2
+      }.toList.sortWith(_.name < _.name)
       
 ###Return Filter
-The Return Filter has the same semantic than the Return Evaluator. It can be used as with the normal TypedTraverser, can be used with the Java Script and with two builtin functions:
+
+The Return Filter has the same semantic as the Return Evaluator. It can be used as with the normal TypedTraverser, can be used with the Java Script and with two builtin functions:
 
 * ReturnAllButStartNode
 * ReturnAll
 
-####Examples
+####Examples for Return Filter
 Traversing with Max Depth 10 and all nodes except start node:
 
-	nodeMap("Neo").
+	startNode.
         doTraverse[…](follow(BREADTH_FIRST) -- "KNOWS", 10, ReturnAllButStartNode)
 
-Using Java Script ("true"):
+Using Java Script Prune Evaluator ("true"):
 
-	nodeMap("Neo").
+	startNode.
         doTraverse[…](follow(BREADTH_FIRST) ->- "CODED_BY", 1, "true")
+        
+Server Side type check and Max Depth 3:
 
+    startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY", 3,
+        endNode.isOfType[Test_Matrix]
+      ).toList.sortWith(_.name < _.name)
+
+Server Side type check and Server Side Java Script Prune Evaluator
+      
+    startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY",
+        "position.length() >= 1",
+        endNode.isOfType[Test_Matrix]
+      ).toList.sortWith(_.name < _.name)
 
 
 ##Batch Processing
