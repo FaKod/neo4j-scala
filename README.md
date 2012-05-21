@@ -199,7 +199,7 @@ To define relation types and directions use the follow method. Some examples
 ```scala
 follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" // BOTH for "KNOWS", OUTGOING for "CODED_BY"
 follow -<- "BAR" -- "FOO"                       // INCOMING for "BAR", BOTH for "FOO", defaults to DEPTH_FIRST
-	follow(DEPTH_FIRST) ->- "FOOBAR"                // OUTGOING for "FOOBAR"
+follow(DEPTH_FIRST) ->- "FOOBAR"                // OUTGOING for "FOOBAR"
 ```
 
 So the traverser, that returns an Iterable[MatrixBase], can be written like this:
@@ -220,13 +220,13 @@ PartialFunctions can be handled with a case statement, like this:
 
 ```scala
 node.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
-   	END_OF_GRAPH // predefined partial function
+   		END_OF_GRAPH // predefined partial function
  	} {
-	// if node is of type Matrix and TraversalPosition.depth == 2 then check lenth
-   	case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+		// if node is of type Matrix and TraversalPosition.depth == 2 then check lenth
+   		case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
 
-	// if node is of type NonMatrix then false
-   	case (y: NonMatrix, _) => false
+		// if node is of type NonMatrix then false
+   		case (y: NonMatrix, _) => false
  	}
 ```
 
@@ -236,12 +236,14 @@ Assuming that Matrix and NonMatrix are inherited from MatrixBase the traverser w
 
 The example above returns an Iterable[MatrixBase]. This allows to use the powerful Scala collections, f.e.:
 
-	...}.toList.sortWith(_.name < _.name) // sorts Nodes by name
-	
-	...}.toList.flatMap(_.name) // List(N, e, o, M, o, r, p, h, e, u, s)
-	
-	...}.toList.par. . . // do something with parallel collections
-	
+```scala
+...}.toList.sortWith(_.name < _.name) // sorts Nodes by name
+
+...}.toList.flatMap(_.name) // List(N, e, o, M, o, r, p, h, e, u, s)
+
+...}.toList.par. . . // do something with parallel collections
+```
+
 Where '_' is automatically replaced by MatrixBase instances.
 	
 Finally we can write, f.e.:
