@@ -21,24 +21,26 @@ You may find [Neo4j-Spatial-Scala](http://github.com/FaKod/neo4j-spatial-scala) 
 
 Or try to maven fetch it with a Github Maven Repo:
 
-	    <repositories>
-	      <repository>
-	        <id>fakod-snapshots</id>
-	        <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
-	      </repository>
-	      <repository>
-               <id>fakod-releases</id>
-               <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/releases</url>
-              </repository>
-	    </repositories>
+```xml
+<repositories>
+  <repository>
+    <id>fakod-snapshots</id>
+    <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
+  </repository>
+  <repository>
+          <id>fakod-releases</id>
+          <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/releases</url>
+         </repository>
+</repositories>
 
-	    <dependencies>
-	      <dependency>
-	        <groupId>org.neo4j</groupId>
-	        <artifactId>neo4j-scala</artifactId>
-	        <version>0.1.0</version>
-	      </dependency>
-	    </dependencies>
+<dependencies>
+  <dependency>
+    <groupId>org.neo4j</groupId>
+    <artifactId>neo4j-scala</artifactId>
+    <version>0.1.0</version>
+  </dependency>
+</dependencies>
+```
 
 ##Troubleshooting
 
