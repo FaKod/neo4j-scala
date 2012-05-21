@@ -64,10 +64,10 @@ One possibility is to use the EmbeddedGraphDatabaseServiceProvider for embedded 
 The class MyNeo4jClass using the wrapper is f.e.:
 
 ```scala
-    class MyNeo4jClass extends SomethingClass with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
-      def neo4jStoreDir = "/tmp/temp-neo-test"
-      . . .
-    }
+class MyNeo4jClass extends SomethingClass with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
+  def neo4jStoreDir = "/tmp/temp-neo-test"
+  . . .
+}
 ```
 
 Available are:
@@ -82,12 +82,12 @@ Available are:
 Transactions are wrapped by withTx. After leaving the "scope" success is called (or rollback if an exception is raised):
 
 ```scala
-    withTx {
-     implicit neo =>
-       val start = createNode
-       val end = createNode
-       start --> "foo" --> end
-    }
+withTx {
+ implicit neo =>
+   val start = createNode
+   val end = createNode
+   start --> "foo" --> end
+}
 ```
 
 ##Using an Index
@@ -95,24 +95,24 @@ Transactions are wrapped by withTx. After leaving the "scope" success is called 
 Neo4j provides indexes for nodes and relationships. The indexes can be configured by mixing in the Neo4jIndexProvider trait. See [Indexing](http://docs.neo4j.org/chunked/stable/indexing.html)
 
 ```scala
-    class MyNeo4jClass extends . . . with Neo4jIndexProvider {
-      // configuration for the index being created.
-      override def NodeIndexConfig = ("MyTest1stIndex", Map("provider" -> "lucene", "type" -> "fulltext")) ::
-                                     ("MyTest2ndIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
-    }
+class MyNeo4jClass extends . . . with Neo4jIndexProvider {
+  // configuration for the index being created.
+  override def NodeIndexConfig = ("MyTest1stIndex", Map("provider" -> "lucene", "type" -> "fulltext")) ::
+                                 ("MyTest2ndIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
+}
 ```
 
 Use one of the configured indexes with
 
 ```scala
-    val nodeIndex = getNodeIndex("MyTest1stIndex").get
+val nodeIndex = getNodeIndex("MyTest1stIndex").get
 ```
 
 Add and remove entries by:
 
 ```scala
-    nodeIndex += (Node_A, "title", "The Matrix")
-    nodeIndex -= (Node_A)
+nodeIndex += (Node_A, "title", "The Matrix")
+nodeIndex -= (Node_A)
 ```
 
 ##Relations
@@ -122,14 +122,14 @@ Using this wrapper, this is how creating two relationships can look in Scala.
 The String are automatically converted into Dynamic Relationsships:
 
 ```scala
-    start --> "KNOWS" --> intermediary --> "KNOWS" --> end
-    left --> "foo" --> middle <-- "bar" <-- right
+start --> "KNOWS" --> intermediary --> "KNOWS" --> end
+left --> "foo" --> middle <-- "bar" <-- right
 ```
 
 To return the Property Container for the Relation Object use the '<' method:
 
 ```scala
-    val relation = start --> "KNOWS" --> end <
+val relation = start --> "KNOWS" --> end <
 ```
 
 ##Properties
@@ -137,51 +137,55 @@ To return the Property Container for the Relation Object use the '<' method:
 And this is how getting and setting properties on a node or relationship looks like :
 
 ```scala
-    // setting the property foo
-    start("foo") = "bar"
-    // cast Object to String and match . . .
-    start[String]("foo") match {
-    	case Some(x) => println(x)
-	    case None => println("aww")
-    }
+// setting the property foo
+start("foo") = "bar"
+// cast Object to String and match . . .
+start[String]("foo") match {
+  case Some(x) => println(x)
+  case None => println("aww")
+}
 ```
 
 ##Using Case Classes
 
 Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the properties are stored as key/values to the Property Container, thai can be a Node or a Relation. However, Working types are limited to basic types like String, integer etc.
 
-    case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
+```scala
+case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
-    . . .
-    withTx {
-      implicit neo =>
-        // create new Node with Case Class Test
-        val node1 = createNode(Test("Something", 1, 2, 3.3, 10, true))
+. . .
+withTx {
+  implicit neo =>
+    // create new Node with Case Class Test
+    val node1 = createNode(Test("Something", 1, 2, 3.3, 10, true))
 
-        // can Test be created from node
-        val b:Boolean = node.toCCPossible[Test]
+    // can Test be created from node
+    val b:Boolean = node.toCCPossible[Test]
 
-        // or using Option[T] (returning Some[T] if possible)
-        val nodeOption: Option[Test] = node.toCC[Test]
- 
-        // yield all Nodes that are of type Case Class Test
-		val tests = for(n <- getTraverser; t <- n.toCC[Test]) yield t
-		
-		// create new relation with Case Class Test
-		node1 --> "foo" --> node2 < Test("other", 0, 1, 1.3, 1, false)
-    }
+    // or using Option[T] (returning Some[T] if possible)
+    val nodeOption: Option[Test] = node.toCC[Test]
+
+    // yield all Nodes that are of type Case Class Test
+    val tests = for(n <- getTraverser; t <- n.toCC[Test]) yield t
+
+    // create new relation with Case Class Test
+    node1 --> "foo" --> node2 < Test("other", 0, 1, 1.3, 1, false)
+ }
+```
 
 ##Traversing
 
 Besides, the neo4j scala binding makes it possible to write stop and returnable evaluators in a functional style :
 
-    //StopEvaluator.END_OF_GRAPH, written in a Scala idiomatic way :
-    start.traverse(Traverser.Order.BREADTH_FIRST, (tp : TraversalPosition) => false, 
-		ReturnableEvaluator.ALL_BUT_START_NODE, "foo", Direction.OUTGOING)
-    
-    //ReturnableEvaluator.ALL_BUT_START_NODE, written in a Scala idiomatic way :
-    start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), 
-		"foo", Direction.OUTGOING)
+```scala
+//StopEvaluator.END_OF_GRAPH, written in a Scala idiomatic way :
+start.traverse(Traverser.Order.BREADTH_FIRST, (tp : TraversalPosition) => false, 
+ReturnableEvaluator.ALL_BUT_START_NODE, "foo", Direction.OUTGOING)
+
+//ReturnableEvaluator.ALL_BUT_START_NODE, written in a Scala idiomatic way :
+start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : TraversalPosition) => tp.notStartNode(), 
+"foo", Direction.OUTGOING)
+```
 
 ##Typed Traversing
 
@@ -192,17 +196,21 @@ But first define Relation Types and Directions:
 
 To define relation types and directions use the follow method. Some examples
 
-	follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" // BOTH for "KNOWS", OUTGOING for "CODED_BY"
-	follow -<- "BAR" -- "FOO"                       // INCOMING for "BAR", BOTH for "FOO", defaults to DEPTH_FIRST
+```scala
+follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" // BOTH for "KNOWS", OUTGOING for "CODED_BY"
+follow -<- "BAR" -- "FOO"                       // INCOMING for "BAR", BOTH for "FOO", defaults to DEPTH_FIRST
 	follow(DEPTH_FIRST) ->- "FOOBAR"                // OUTGOING for "FOOBAR"
+```
 
 So the traverser, that returns an Iterable[MatrixBase], can be written like this:
 
-	myNode.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
-	    . . .block1. . .
-	} {
-	    . . .block2. . .
-	}
+```scala
+myNode.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
+    . . .block1. . .
+} {
+    . . .block2. . .
+}
+```
 
 ###Return and Stop Evaluator
 
@@ -210,15 +218,17 @@ So the traverser, that returns an Iterable[MatrixBase], can be written like this
 
 PartialFunctions can be handled with a case statement, like this:
 
-	node.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
-    	END_OF_GRAPH // predefined partial function
-  	} {
-		// if node is of type Matrix and TraversalPosition.depth == 2 then check lenth
-    	case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+```scala
+node.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
+   	END_OF_GRAPH // predefined partial function
+ 	} {
+	// if node is of type Matrix and TraversalPosition.depth == 2 then check lenth
+   	case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
 
-		// if node is of type NonMatrix then false
-    	case (y: NonMatrix, _) => false
-  	}
+	// if node is of type NonMatrix then false
+   	case (y: NonMatrix, _) => false
+ 	}
+```
 
 Assuming that Matrix and NonMatrix are inherited from MatrixBase the traverser will handle that correctly. X and y only matches if the given type can be marshaled to Matrix or NonMatrix and assigned from MatrixBase. Additionally, you can use the TraversalPosition in both case statements or ignore it with '_'. The example defines that depth must be 2 and the Matrix.name parameter must be of length > 2. NonMatrix classes are not returned. The Stop Evaluator always returns false.
 
@@ -236,23 +246,27 @@ Where '_' is automatically replaced by MatrixBase instances.
 	
 Finally we can write, f.e.:
 
-	val list:List[MatrixBase] = node.doTraverse[MatrixBase](follow -<- "KNOWS") {
-	    case _ => false
-	} {
-	    case (x: Matrix, _) => true
-	    case (x: NonMatrix, _) => false
-	}.toList.sortWith(_.name < _.name)
+```scala
+val list:List[MatrixBase] = node.doTraverse[MatrixBase](follow -<- "KNOWS") {
+    case _ => false
+} {
+    case (x: Matrix, _) => true
+    case (x: NonMatrix, _) => false
+}.toList.sortWith(_.name < _.name)
+```
 
 ###Using a List of Nodes
 
 Instead of one Node you can use a List of Nodes (List[Node]). The given traverser is started multithreaded for every node in the List. The resulting threads are joined, the result-lists are appended and Node duplicates removed. F.e:
 
-	val erg1 = startWithNodes.doTraverse[MatrixBase](follow -<- "KNOWS") {
-	    case _ => false
-	  } {
-	    case (x: Matrix, _) => true
-	    case (x: NonMatrix, _) => false
-	  }.toList.sortWith(_.name < _.name)
+```scala
+val erg1 = startWithNodes.doTraverse[MatrixBase](follow -<- "KNOWS") {
+    case _ => false
+  } {
+    case (x: Matrix, _) => true
+    case (x: NonMatrix, _) => false
+  }.toList.sortWith(_.name < _.name)
+```
 
 Where startWithNodes is of type List[Node].
 
@@ -274,29 +288,35 @@ The **PruneEvaluator** defines where to stop traversing relations. It has to be 
 
 ####Examples for Prune Evaluator / MaxDepth
 Using the case class PruneEvaluator ("JAVASCRIPT" is dafault, "false" is Java Script code):
-      
-      startNode.doTraverse[Test_MatrixBase](follow -- "KNOWS" ->- "CODED_BY") {
-        PruneEvaluator("false")
-      } {
-        case (x: Test_Matrix, tp) if (tp.depth == 3) => x.name.length > 2
-        case (x: Test_NonMatrix, _) => false
-      }.toList.sortWith(_.name < _.name)
-      
+  
+```scala    
+startNode.doTraverse[Test_MatrixBase](follow -- "KNOWS" ->- "CODED_BY") {
+  PruneEvaluator("false")
+} {
+  case (x: Test_Matrix, tp) if (tp.depth == 3) => x.name.length > 2
+  case (x: Test_NonMatrix, _) => false
+}.toList.sortWith(_.name < _.name)
+```
+
 Using a Java Script prune evaluator as a String (implicit conversion involved)
-      
-      startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
-        "position.length() > 100;"
-      } {
-        case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
-        case (x: Test_NonMatrix, _) => false
-      }.toList.sortWith(_.name < _.name)
+    
+```scala  
+startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
+  "position.length() > 100;"
+} {
+  case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+  case (x: Test_NonMatrix, _) => false
+}.toList.sortWith(_.name < _.name)
+```
       
 Using MaxDepth 100:
 
-      startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY")(100) {
-        case (x: Test_Matrix, _) => x.name.length > 2
-      }.toList.sortWith(_.name < _.name)
-      
+```scala
+startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY")(100) {
+  case (x: Test_Matrix, _) => x.name.length > 2
+}.toList.sortWith(_.name < _.name)
+```
+
 ###Return Filter
 
 The Return Filter has the same semantic as the Return Evaluator. It can be used as with the normal TypedTraverser, can be used with the Java Script and with two builtin functions:
@@ -307,27 +327,33 @@ The Return Filter has the same semantic as the Return Evaluator. It can be used 
 ####Examples for Return Filter
 Traversing with Max Depth 10 and all nodes except start node:
 
-	startNode.
-        doTraverse[…](follow(BREADTH_FIRST) -- "KNOWS", 10, ReturnAllButStartNode)
+```scala
+startNode.
+       doTraverse[…](follow(BREADTH_FIRST) -- "KNOWS", 10, ReturnAllButStartNode)
+```
 
 Using Java Script Prune Evaluator ("true"):
 
-	startNode.
-        doTraverse[…](follow(BREADTH_FIRST) ->- "CODED_BY", 1, "true")
-        
+```scala
+startNode.
+       doTraverse[…](follow(BREADTH_FIRST) ->- "CODED_BY", 1, "true")
+```
 Server Side type check and Max Depth 3:
 
-    startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY", 3,
-        endNode.isOfType[Test_Matrix]
-      ).toList.sortWith(_.name < _.name)
+```scala
+startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY", 3,
+    endNode.isOfType[Test_Matrix]
+  ).toList.sortWith(_.name < _.name)
+```
 
 Server Side type check and Server Side Java Script Prune Evaluator
-      
-    startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY",
-        "position.length() >= 1",
-        endNode.isOfType[Test_Matrix]
-      ).toList.sortWith(_.name < _.name)
 
+```scala     
+startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY",
+    "position.length() >= 1",
+    endNode.isOfType[Test_Matrix]
+  ).toList.sortWith(_.name < _.name)
+```
 
 ##Batch Processing
 
@@ -335,32 +361,44 @@ Neo4j has a batch insertion mode intended for initial imports, which must run in
 
 The Java interfaces are slightly different. I wrote some wrapper classes to support nearly transparent usage of batch node and batch relation insertion. Means same code for batch insertion and for normal non batch mode. Instead of using
 
-    class Builder extends Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with Neo4jIndexProvider {...}
+```scala
+class Builder extends Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with Neo4jIndexProvider {...}
+```
 
 simply exchange the provider traits with
 
-    class Builder extends Neo4jWrapper with Neo4jBatchIndexProvider with BatchGraphDatabaseServiceProvider {...}
+```scala
+class Builder extends Neo4jWrapper with Neo4jBatchIndexProvider with BatchGraphDatabaseServiceProvider {...}
+```
 
 getting the indexes is still the same code
 
-    val nodeIndex = getNodeIndex("NodeIndex").get
-	val relationIndex = getRelationIndex("RelationIndex").get
-	
+```scala
+val nodeIndex = getNodeIndex("NodeIndex").get
+val relationIndex = getRelationIndex("RelationIndex").get
+```
+
 setting cache size:
 
-	nodeIndex.setCacheCapacity("NodeIndex", 1000000)
-	relationIndex.setCacheCapacity("RelationIndex", 1000000)
-	
+```scala
+nodeIndex.setCacheCapacity("NodeIndex", 1000000)
+relationIndex.setCacheCapacity("RelationIndex", 1000000)
+```
+
 Nevertheless, indexes are not available till flushing. To flush call:
 
-    nodeIndex.flush
-	relationIndex.flush
+```scala
+nodeIndex.flush
+relationIndex.flush
+```
 
 After insertion, the batch index manager and batch insertion manager have to be shut down
 
-    class Builder extends Neo4jWrapper . . .{
-	   . . .
-	   shutdownIndex
-	   shutdown(ds)
-	   . . .
-	}
+```scala
+class Builder extends Neo4jWrapper . . .{
+	. . .
+	shutdownIndex
+	shutdown(ds)
+	. . .
+}
+```
