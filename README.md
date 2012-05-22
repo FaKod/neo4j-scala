@@ -48,7 +48,7 @@ Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scal
 
 #Versions
 
-##0.2.0-SNAPSHOT
+##0.2.0-M1
 
 * Switched to Neo4j Version 1.7
 * Introducing Typed Traverser for type safe traversals
