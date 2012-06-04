@@ -97,8 +97,8 @@ Neo4j provides indexes for nodes and relationships. The indexes can be configure
 ```scala
 class MyNeo4jClass extends . . . with Neo4jIndexProvider {
   // configuration for the index being created.
-  override def NodeIndexConfig = ("MyTest1stIndex", Map("provider" -> "lucene", "type" -> "fulltext")) ::
-                                 ("MyTest2ndIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
+  override def NodeIndexConfig = ("MyTest1stIndex", Some(Map("provider" -> "lucene", "type" -> "fulltext"))) ::
+                                 ("MyTest2ndIndex", Some(Map("provider" -> "lucene", "type" -> "fulltext"))) :: Nil
 }
 ```
 
