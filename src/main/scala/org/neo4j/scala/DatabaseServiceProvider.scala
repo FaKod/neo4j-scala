@@ -35,12 +35,12 @@ trait EmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider 
   /**
    * using an instance of an embedded graph database
    */
-
-  import collection.JavaConversions.mapAsJavaMap
-
-  val ds: DatabaseService = DatabaseServiceImpl(
-    new EmbeddedGraphDatabase(neo4jStoreDir, new jMap[String, String](configParams))
-  )
+  val ds: DatabaseService = {
+    import collection.JavaConversions.mapAsJavaMap
+    DatabaseServiceImpl(
+      new EmbeddedGraphDatabase(neo4jStoreDir, new jMap[String, String](configParams))
+    )
+  }
 }
 
 /**
@@ -49,10 +49,13 @@ trait EmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider 
 private[scala] object SingeltonProvider {
   private var ds: Option[DatabaseService] = None
 
-  def apply(neo4jStoreDir: String) = ds match {
+  def apply(neo4jStoreDir: String, configParams: Map[String, String]) = ds match {
     case Some(x) => x
     case None =>
-      ds = Some(DatabaseServiceImpl(new EmbeddedGraphDatabase(neo4jStoreDir)))
+      import collection.JavaConversions.mapAsJavaMap
+      ds = Some(DatabaseServiceImpl(new EmbeddedGraphDatabase(
+        neo4jStoreDir, new jMap[String, String](configParams)))
+      )
       ds.get
   }
 }
@@ -69,9 +72,15 @@ trait SingletonEmbeddedGraphDatabaseServiceProvider extends GraphDatabaseService
   def neo4jStoreDir: String
 
   /**
+   * setup configuration parameters
+   * @return Map[String, String] configuration parameters
+   */
+  def configParams = Map[String, String]()
+
+  /**
    * using an instance of an embedded graph database
    */
-  val ds: DatabaseService = SingeltonProvider(neo4jStoreDir)
+  val ds: DatabaseService = SingeltonProvider(neo4jStoreDir, configParams)
 }
 
 /**
