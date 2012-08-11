@@ -4,6 +4,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase
 import org.neo4j.kernel.impl.batchinsert.{BatchInserter, BatchInserterImpl}
 import org.neo4j.rest.graphdb.RestGraphDatabase
 import java.net.URI
+import java.util.{HashMap => jMap}
 
 /**
  * Interface for a GraphDatabaseServiceProvider
@@ -26,9 +27,20 @@ trait EmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider 
   def neo4jStoreDir: String
 
   /**
+   * setup configuration parameters
+   * @return Map[String, String] configuration parameters
+   */
+  def configParams = Map[String, String]()
+
+  /**
    * using an instance of an embedded graph database
    */
-  val ds: DatabaseService = DatabaseServiceImpl(new EmbeddedGraphDatabase(neo4jStoreDir))
+
+  import collection.JavaConversions.mapAsJavaMap
+
+  val ds: DatabaseService = DatabaseServiceImpl(
+    new EmbeddedGraphDatabase(neo4jStoreDir, new jMap[String, String](configParams))
+  )
 }
 
 /**
