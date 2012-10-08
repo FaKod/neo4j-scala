@@ -14,29 +14,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.9.1</scala.version>
+        <neo4j.version>1.8</neo4j.version>
+        <neo4j.shell.version>1.8</neo4j.shell.version>
+        <neo4j.rest.version>1.8.RC2</neo4j.rest.version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>Neo4j 1.5</id>
-            <properties>
-            <neo4j.version>1.5</neo4j.version>
-            <neo4j.shell.version>1.5</neo4j.shell.version>
-            <neo4j.rest.version>1.5</neo4j.rest.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>Neo4j 1.7</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <neo4j.version>1.7</neo4j.version>
-                <neo4j.shell.version>1.7</neo4j.shell.version>
-                <neo4j.rest.version>1.8-SNAPSHOT</neo4j.rest.version>
-            </properties>
-        </profile>
-    </profiles>
 
     <developers>
         <developer>
@@ -177,9 +159,9 @@
                 <version>2.9</version>
                 <configuration>
                     <testFailureIgnore>false</testFailureIgnore>
-                    <excludes>
+                    <!--excludes>
                         <exclude>**/*RESTSpec.java</exclude>
-                    </excludes>
+                    </excludes-->
                     <includes>
                         <include>**/unittest/*.java</include>
                     </includes>
