@@ -1,7 +1,8 @@
-
 package org.neo4j.rest.graphdb.traversal;
 
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.traversal.Evaluator;
+import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.helpers.Predicate;
 import org.neo4j.kernel.Traversal;
@@ -10,6 +11,11 @@ import org.neo4j.kernel.Uniqueness;
 import java.util.*;
 
 public class RestOldTraverserWrapper {
+
+    private static final Evaluator RETURN_ALL = Evaluators.all();
+
+    private static final Evaluator RETURN_ALL_BUT_START_NODE = Evaluators.excludeStartPosition();
+
     private static class TraverserImpl implements org.neo4j.graphdb.Traverser, Iterator<Node> {
         private TraversalPosition currentPos;
         private Path nextPath;
@@ -180,7 +186,7 @@ public class RestOldTraverserWrapper {
         rt.maxDepth(maxDepth);
 
         // return all nodes incl. start node
-        rt.filter(Traversal.returnAll());
+        rt.evaluator(RETURN_ALL);
 
         TraverserImpl result = new TraverserImpl();
         result.filter = new Filter(result, returnableEvaluator);
@@ -203,9 +209,9 @@ public class RestOldTraverserWrapper {
          */
         if ("builtin".equalsIgnoreCase(filterLanguage)) {
             if ("all".equalsIgnoreCase(filterBody))
-                rt.filter(Traversal.returnAll());
+                rt.evaluator(RETURN_ALL);
             else if ("all_but_start_node".equalsIgnoreCase(filterBody))
-                rt.filter(Traversal.returnAllButStartNode());
+                rt.evaluator(RETURN_ALL_BUT_START_NODE);
         } else {
             RestTraversalDescription.ScriptLanguage _filterLanguage = RestTraversalDescription.ScriptLanguage.valueOf(filterLanguage);
             rt.filter(_filterLanguage, filterBody);
