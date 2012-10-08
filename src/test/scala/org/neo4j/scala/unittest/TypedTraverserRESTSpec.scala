@@ -61,7 +61,7 @@ class TypedTraverserRESTSpec extends SpecificationWithJUnit with Neo4jWrapper wi
          */
       }.toList.sortWith(_.name < _.name)
 
-      erg must contain(Test_Matrix("Agent Smith", "Program"), Test_Matrix("The Architect", "Whatever"))
+      erg must contain(Test_Matrix("Cypher", "Hacker"), Test_Matrix("The Architect", "Whatever"))
       erg.length must be_==(2)
     }
 
