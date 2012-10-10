@@ -12,6 +12,8 @@ See this [GIST](https://gist.github.com/1331556) for a usual Neo4j Matrix Exampl
 
 You may find [Neo4j-Spatial-Scala](http://github.com/FaKod/neo4j-spatial-scala) interesting as well.
 
+All discussions (if there are any) see Google Group [neo4j-scala](https://groups.google.com/forum/#!forum/neo4j-scala)
+
 
 ##Building
 
