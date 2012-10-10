@@ -16,7 +16,8 @@
         <scala.version>2.9.1</scala.version>
         <neo4j.version>1.8</neo4j.version>
         <neo4j.shell.version>1.8</neo4j.shell.version>
-        <neo4j.rest.version>1.8.RC2</neo4j.rest.version>
+        <neo4j.cypher.version>1.8</neo4j.cypher.version>
+        <neo4j.rest.version>1.8</neo4j.rest.version>
     </properties>
 
 
