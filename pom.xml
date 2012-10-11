@@ -107,6 +107,14 @@
             <artifactId>neo4j-rest-graphdb</artifactId>
             <version>${neo4j.rest.version}</version>
         </dependency>
+
+        <!-- Cypher -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-cypher</artifactId>
+            <version>${neo4j.cypher.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
