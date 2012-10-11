@@ -142,7 +142,7 @@ trait RestTypedTraverser extends TypedTraverserBase {
       }
 
       import collection.JavaConversions.asScalaIterator
-      new TypedNodeIterator[T](traverser.iterator)
+      new TypedPropertyContainerIterator[T](traverser.iterator)
     }
 
 
@@ -171,7 +171,7 @@ trait RestTypedTraverser extends TypedTraverserBase {
       }
 
       import collection.JavaConversions.asScalaIterator
-      new TypedNodeIterator[T](traverser.iterator)
+      new TypedPropertyContainerIterator[T](traverser.iterator)
     }
   }
 

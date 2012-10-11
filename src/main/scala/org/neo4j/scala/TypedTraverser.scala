@@ -2,8 +2,23 @@ package org.neo4j.scala
 
 import org.neo4j.graphdb.Traverser.Order
 import collection.mutable.Buffer
-import org.neo4j.graphdb.{TraversalPosition, Direction, DynamicRelationshipType, Node}
+import org.neo4j.graphdb._
+import scala.Some
 
+/**
+ * Iterator convenience. Mapps a Property Container Iterator to a T Iterator
+ * Nodes that can't be converted to T are returned as null
+ */
+class TypedPropertyContainerIterator[T: Manifest](pcIter: Iterator[PropertyContainer]) extends Iterable[T] with Neo4jWrapperImplicits {
+  def iterator = new Iterator[T] {
+    def hasNext = pcIter.hasNext
+
+    def next: T = pcIter.next.toCC[T] match {
+      case Some(x) => x
+      case None => null.asInstanceOf[T]
+    }
+  }
+}
 
 /**
  * Basics for Typed Traverser
@@ -11,21 +26,6 @@ import org.neo4j.graphdb.{TraversalPosition, Direction, DynamicRelationshipType,
 trait TypedTraverserBase {
 
   self: Neo4jWrapper =>
-
-  /**
-   * Iterator convenience. Mapps a Node Iterator to a T Iterator
-   * Nodes that can't be converted to T are returned as null
-   */
-  class TypedNodeIterator[T: Manifest](nodeIter: Iterator[Node]) extends Iterable[T] {
-    def iterator = new Iterator[T] {
-      def hasNext = nodeIter.hasNext
-
-      def next: T = nodeIter.next.toCC[T] match {
-        case Some(x) => x
-        case None => null.asInstanceOf[T]
-      }
-    }
-  }
 
   /**
    * the follow keyword
@@ -91,7 +91,6 @@ trait TypedTraverserBase {
 }
 
 
-
 /**
  * Trait for a Typed Traversal API
  */
@@ -136,10 +135,10 @@ trait TypedTraverser extends TypedTraverserBase {
      *
      * <pre><code>
      * myNode.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
-     *   END_OF_GRAPH
+     * END_OF_GRAPH
      * } {
-     *  case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
-     *  case (x: NonMatrix, _) => false
+     * case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+     * case (x: NonMatrix, _) => false
      * }.toList.sortWith(_.name < _.name)
      * </code></pre>
      *
@@ -163,7 +162,7 @@ trait TypedTraverser extends TypedTraverserBase {
         }, rb.get: _*)
 
       import collection.JavaConversions.asScalaIterator
-      new TypedNodeIterator[T](traverser.iterator)
+      new TypedPropertyContainerIterator[T](traverser.iterator)
     }
   }
 
@@ -180,10 +179,10 @@ trait TypedTraverser extends TypedTraverserBase {
      *
      * <pre><code>
      * myListOfNodes.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
-     *   END_OF_GRAPH
+     * END_OF_GRAPH
      * } {
-     *  case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
-     *  case (x: NonMatrix, _) => false
+     * case (x: Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+     * case (x: NonMatrix, _) => false
      * }.toList.sortWith(_.name < _.name)
      * </code></pre>
      *
