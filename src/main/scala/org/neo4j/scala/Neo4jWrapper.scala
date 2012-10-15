@@ -241,6 +241,9 @@ private[scala] class RichPropertyContainer(propertyContainer: PropertyContainer)
    * updates the property
    * <code>node("property") = value</code>
    */
-  def update(property: String, value: Any): Unit =
-    propertyContainer.setProperty(property, value)
+  def update(property: String, value: Any): Unit = value match {
+    case null =>
+    case None =>
+    case _ => propertyContainer.setProperty(property, value)
+  }
 }
