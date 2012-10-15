@@ -60,6 +60,8 @@ object CaseClassDeserializer {
         // if the value is directly assignable: use it
         case x: AnyRef if (x.getClass.isAssignableFrom(paramType.c)) =>
           values += x
+        case x: Array[_] =>
+          values += x
         // otherwise try to create an instance using der String Constructor
         case x: AnyRef =>
           val paramCtor = paramType.c.getConstructor(classOf[String])
