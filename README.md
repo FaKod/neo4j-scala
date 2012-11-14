@@ -39,7 +39,7 @@ Or try to maven fetch it with a Github Maven Repo:
   <dependency>
     <groupId>org.neo4j</groupId>
     <artifactId>neo4j-scala</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0-M2-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ```
@@ -49,6 +49,13 @@ Or try to maven fetch it with a Github Maven Repo:
 Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scala/issues) to submit bug reports or feature requests.
 
 #Versions
+
+##0.2.0-M2-SNAPSHOT
+
+* Switched to Neo4j Version 1.8
+* Added simple Cypher Support
+* Added programmatic access to Configuration Parameter
+* Using incremental Scala compiler now
 
 ##0.2.0-M1
 
@@ -276,7 +283,6 @@ Where startWithNodes is of type List[Node].
 
 
 ##REST Typed Traversing 
-* Only working with version 1.8-SNAPSHOT of **neo4j-rest-graphdb**
 
 The main diffenrence between the non REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
 
@@ -358,6 +364,23 @@ startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODE
     endNode.isOfType[Test_Matrix]
   ).toList.sortWith(_.name < _.name)
 ```
+
+##Simple Cypher Support
+
+The following example shows how to use Cypher together with typed results. In this case "execute" returns the case class Test_Matrix.
+
+```scala
+class MyClass extends Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with Cypher {
+	. . .
+	val query = "start n=node(" + nodeId + ") return n, n.name"
+
+    val typedResult = query.execute.asCC[Test_Matrix]("n")
+
+    typedResult.next.name must be_==("Neo")
+    . . .
+}
+```
+
 
 ##Batch Processing
 
