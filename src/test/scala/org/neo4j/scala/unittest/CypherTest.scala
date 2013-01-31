@@ -50,5 +50,15 @@ class CypherSpec extends SpecificationWithJUnit with Neo4jWrapper with Singleton
       success
     }
 
+    "be able to execute (*) query" in {
+
+      val query = """start n=node(*) where n.name?="Neo" return n"""
+
+      val typedResult = query.execute.asCC[Test_Matrix]("n")
+      typedResult.toList.size must be_>(0)
+
+      success
+    }
+
   }
 }
