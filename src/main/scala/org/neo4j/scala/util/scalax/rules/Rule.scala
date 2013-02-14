@@ -2,6 +2,8 @@ package org.neo4j.scala.util
 package scalax
 package rules
 
+import language.postfixOps
+
 /**A Rule is a function from some input to a Result.  The result may be:
  * <ul>
  * <li>Success, with a value of some type and an output that may serve as the input to subsequent rules.</li>

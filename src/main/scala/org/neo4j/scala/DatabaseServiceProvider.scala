@@ -1,10 +1,11 @@
 package org.neo4j.scala
 
 import org.neo4j.kernel.EmbeddedGraphDatabase
-import org.neo4j.kernel.impl.batchinsert.{BatchInserter, BatchInserterImpl}
+import org.neo4j.unsafe.batchinsert.{BatchInserter, BatchInserterImpl}
 import org.neo4j.rest.graphdb.RestGraphDatabase
 import java.net.URI
 import java.util.{HashMap => jMap}
+import org.neo4j.unsafe.batchinsert.BatchInserters
 
 /**
  * Interface for a GraphDatabaseServiceProvider
@@ -92,11 +93,11 @@ private[scala] object SingeltonBatchProvider {
   def apply(neo4jStoreDir: String) = inserter match {
     case Some(x) => x
     case None =>
-      inserter = Some(new BatchInserterImpl(neo4jStoreDir))
+      inserter = Some(BatchInserters.inserter(neo4jStoreDir))
       inserter.get
   }
 
-  lazy val ds: DatabaseService = DatabaseServiceImpl(inserter.get.getGraphDbService)
+  lazy val ds: DatabaseService = DatabaseServiceImpl(BatchInserters.batchDatabase(inserter.get.getStoreDir))
 }
 
 /**

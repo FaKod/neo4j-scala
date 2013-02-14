@@ -3,6 +3,7 @@ package org.neo4j.scala
 import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
 import java.io.PrintWriter
 import org.neo4j.graphdb.PropertyContainer
+import language.implicitConversions
 
 /**
  * add additional as[T] interface where T has to be
@@ -31,7 +32,7 @@ class TypedExecutionResultImpl(val er: ExecutionResult) extends TypedExecutionRe
 
   def columns = er.columns
 
-  def symbols = er.symbols
+//  def symbols = er.symbols
 
   def javaColumns = er.javaColumns
 

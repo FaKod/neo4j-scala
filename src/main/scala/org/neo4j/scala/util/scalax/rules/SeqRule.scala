@@ -2,6 +2,9 @@ package org.neo4j.scala.util
 package scalax
 package rules
 
+import scala.language.reflectiveCalls
+import scala.language.postfixOps
+
 /**
  * A workaround for the difficulties of dealing with
  * a contravariant 'In' parameter type...

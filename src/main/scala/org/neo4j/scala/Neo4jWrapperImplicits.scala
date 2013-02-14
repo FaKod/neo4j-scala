@@ -1,6 +1,7 @@
 package org.neo4j.scala
 
 import org.neo4j.graphdb._
+import language.implicitConversions
 
 /**
  * trait for implicits

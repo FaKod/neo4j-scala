@@ -4,6 +4,7 @@ import util.CaseClassDeserializer
 import collection.JavaConversions._
 import CaseClassDeserializer._
 import org.neo4j.graphdb._
+import org.neo4j.tooling.GlobalGraphOperations
 import index.IndexManager
 
 /**
@@ -88,7 +89,7 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
    * @return all nodes in the node space
    */
   def getAllNodes(implicit ds: DatabaseService): Iterable[Node] =
-    ds.gds.getAllNodes
+    GlobalGraphOperations.at(ds.gds).getAllNodes
 
   /**
    * Returns all relationship types currently in the underlying store.
@@ -103,7 +104,7 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
    * @return all relationship types in the underlying store
    */
   def getRelationshipTypes(implicit ds: DatabaseService): Iterable[RelationshipType] =
-    ds.gds.getRelationshipTypes
+    GlobalGraphOperations.at(ds.gds).getAllRelationshipTypes
 
   /**
    * Shuts down Neo4j. After this method has been invoked, it's invalid to
@@ -153,7 +154,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
     }
 
   private def _toCCPossible[T: Manifest](pc: PropertyContainer): Option[Class[_]] = {
-    for (cpn <- pc[String](ClassPropertyName); c = Class.forName(cpn) if (manifest[T].erasure.isAssignableFrom(c)))
+    for (cpn <- pc[String](ClassPropertyName); c = Class.forName(cpn) if (manifest[T].runtimeClass.isAssignableFrom(c)))
       return Some(c)
     None
   }
@@ -177,7 +178,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
     toCC[T](pc) match {
       case Some(t) => t
       case _ => throw new IllegalArgumentException("given Case Class: " +
-        manifest[T].erasure.getName + " does not fit to serialized properties")
+        manifest[T].runtimeClass.getName + " does not fit to serialized properties")
     }
   }
 }

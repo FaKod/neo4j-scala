@@ -3,6 +3,7 @@ package scalax
 package rules
 
 import scala.collection.mutable.HashMap
+import language.reflectiveCalls
 
 trait MemoisableRules extends Rules {
   def memo[In <: Memoisable, Out, A, X](key: AnyRef)

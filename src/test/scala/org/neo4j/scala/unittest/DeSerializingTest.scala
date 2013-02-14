@@ -5,6 +5,7 @@ import org.neo4j.scala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import org.neo4j.scala.util.CaseClassDeserializer
 import org.neo4j.graphdb.{Direction, DynamicRelationshipType}
 import sys.ShutdownHookThread
+import util.Random
 
 /**
  * Test spec to check deserialization and serialization of case classes
@@ -58,7 +59,7 @@ class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
 
 class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
-  def neo4jStoreDir = "/tmp/temp-neo-test2"
+  def neo4jStoreDir = "/tmp/temp-neo-test2" + Random.alphanumeric.take(10)
 
   "Node" should {
 
