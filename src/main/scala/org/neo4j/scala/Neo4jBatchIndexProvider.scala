@@ -8,6 +8,7 @@ import org.neo4j.index.impl.lucene.{AbstractIndexHits, LuceneBatchInserterIndexP
 import collection.JavaConversions._
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import collection.mutable.{SynchronizedMap, ConcurrentMap, HashMap}
+import language.implicitConversions
 
 /**
  * provides Index access trait

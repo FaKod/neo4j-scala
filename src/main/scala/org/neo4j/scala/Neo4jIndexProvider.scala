@@ -4,6 +4,7 @@ import org.neo4j.graphdb.index.{Index, RelationshipIndex}
 import scala.collection.mutable.{Map => mutableMap}
 import collection.JavaConversions._
 import org.neo4j.graphdb.{PropertyContainer, Node}
+import language.implicitConversions
 
 /**
  * Provides Index access trait

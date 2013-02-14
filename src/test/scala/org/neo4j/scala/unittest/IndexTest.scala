@@ -3,6 +3,7 @@ package org.neo4j.scala.unittest
 import org.specs2.mutable.SpecificationWithJUnit
 import org.neo4j.scala.{Neo4jIndexProvider, EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import collection.JavaConversions._
+import scala.util.Random
 import sys.ShutdownHookThread
 
 /**
@@ -12,17 +13,19 @@ import sys.ShutdownHookThread
  */
 
 class IndexTestSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider with Neo4jIndexProvider {
+  
+  sequential
 
-  def neo4jStoreDir = "/tmp/temp-neo-index-test"
+  def neo4jStoreDir = "/tmp/temp-neo-index-test" + Random.alphanumeric.take(10) 
 
   override def NodeIndexConfig = ("MyTestIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
 
 
   "Neo4jIndexProvider" should {
 
-    ShutdownHookThread {
-      shutdown(ds)
-    }
+//    ShutdownHookThread {
+//      shutdown(ds)
+//    }
 
     "use the fulltext search index" in {
 

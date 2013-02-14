@@ -2,6 +2,7 @@ package org.neo4j.scala.util
 
 import scalax.rules.scalasig._
 import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
+import language.existentials
 
 /**
  * helper class to store Class object
@@ -29,7 +30,7 @@ object CaseClassDeserializer {
    * default behaviour for T == serialized class
    */
   def deserialize[T: Manifest](m: Map[String, AnyRef]): T =
-    deserialize[T](manifest[T].erasure, m)
+    deserialize[T](manifest[T].runtimeClass, m)
 
   /**
    * convenience method using class manifest
@@ -195,7 +196,7 @@ object CaseClassSigParser {
     case "scala.Char" => classOf[java.lang.Character]
     case "scala.Any" => classOf[Any]
     case "scala.AnyRef" => classOf[AnyRef]
-    case name => Class.forName(name)
+    case _ => Class.forName(path)
   }
 }
 

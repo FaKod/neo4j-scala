@@ -3,7 +3,9 @@ package org.neo4j.scala
 import org.neo4j.graphdb.Traverser.Order
 import collection.mutable.Buffer
 import org.neo4j.graphdb._
-import scala.Some
+import language.implicitConversions
+import language.reflectiveCalls
+import org.neo4j.kernel.Traversal
 
 /**
  * Iterator convenience. Mapps a Property Container Iterator to a T Iterator

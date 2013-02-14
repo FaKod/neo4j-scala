@@ -2,6 +2,9 @@ package org.neo4j.scala.util
 package scalax
 package rules
 
+import language.implicitConversions
+import language.postfixOps
+
 trait Name {
   def name: String
 
