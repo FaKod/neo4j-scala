@@ -1,6 +1,6 @@
 package org.neo4j.scala
 
-import org.neo4j.cypher.{ExecutionResult, ExecutionEngine}
+import org.neo4j.cypher.{PlanDescription, ExecutionResult, ExecutionEngine}
 import java.io.PrintWriter
 import org.neo4j.graphdb.PropertyContainer
 
@@ -31,8 +31,6 @@ class TypedExecutionResultImpl(val er: ExecutionResult) extends TypedExecutionRe
 
   def columns = er.columns
 
-  def symbols = er.symbols
-
   def javaColumns = er.javaColumns
 
   def javaColumnAs[T](column: String) = er.javaColumnAs[T](column)
@@ -49,6 +47,10 @@ class TypedExecutionResultImpl(val er: ExecutionResult) extends TypedExecutionRe
 
   def queryStatistics = er.queryStatistics
 
+  def executionPlanDescription(): PlanDescription = er.executionPlanDescription()
+
+  def close(): Unit = er.close()
+
   /**
    * maps a given column that has to be a property container
    * to a case class
@@ -59,6 +61,7 @@ class TypedExecutionResultImpl(val er: ExecutionResult) extends TypedExecutionRe
   def asCC[T: Manifest](column: String): Iterator[T] = {
     new TypedPropertyContainerIterator(er.columnAs[PropertyContainer](column)).iterator
   }
+
 }
 
 /**
