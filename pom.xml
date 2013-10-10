@@ -6,18 +6,18 @@
     <artifactId>neo4j-scala</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
-    <version>0.2.0-M2-SNAPSHOT</version>
+    <version>0.2.0-M3-SNAPSHOT</version>
     <description>Scala wrapper for Neo4j Graph Database</description>
     <url>http://github.com/fakod/neo4j-scala</url>
     <inceptionYear>2011</inceptionYear>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.9.1</scala.version>
-        <neo4j.version>1.8</neo4j.version>
-        <neo4j.shell.version>1.8</neo4j.shell.version>
-        <neo4j.cypher.version>1.8</neo4j.cypher.version>
-        <neo4j.rest.version>1.8</neo4j.rest.version>
+        <scala.version>2.10.2</scala.version>
+        <neo4j.version>1.9.4</neo4j.version>
+        <neo4j.shell.version>1.9.4</neo4j.shell.version>
+        <neo4j.cypher.version>1.9.4</neo4j.cypher.version>
+        <neo4j.rest.version>1.9</neo4j.rest.version>
     </properties>
 
 
@@ -64,6 +64,11 @@
             <version>${scala.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.7</version>
@@ -72,15 +77,8 @@
 
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2_2.9.1</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.specs2</groupId>
-            <artifactId>specs2-scalaz-core_2.9.1</artifactId>
-            <version>6.0.1</version>
+            <artifactId>specs2_2.10</artifactId>
+            <version>2.2.3</version>
             <scope>test</scope>
         </dependency>
 
