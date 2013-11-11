@@ -13,7 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.10.2</scala.version>
+        <scala.version>2.10.3</scala.version>
         <neo4j.version>1.9.4</neo4j.version>
         <neo4j.shell.version>1.9.4</neo4j.shell.version>
         <neo4j.cypher.version>1.9.4</neo4j.cypher.version>
@@ -47,8 +47,26 @@
 
     <repositories>
         <repository>
-            <id>neo4j-public-repository</id>
-            <url>http://m2.neo4j.org</url>
+            <id>neo4j-release-repository</id>
+            <name>Neo4j Maven 2 release repository</name>
+            <url>http://m2.neo4j.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>neo4j-snapshot-repository</id>
+            <name>Neo4j Maven 2 snapshot repository</name>
+            <url>http://m2.neo4j.org/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
         <repository>
             <id>fakod-snapshots</id>
@@ -78,7 +96,7 @@
         <dependency>
             <groupId>org.specs2</groupId>
             <artifactId>specs2_2.10</artifactId>
-            <version>2.2.3</version>
+            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -206,7 +224,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.6</version>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
