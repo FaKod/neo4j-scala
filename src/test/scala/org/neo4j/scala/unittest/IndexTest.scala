@@ -17,8 +17,6 @@ class IndexTestSpec extends SpecificationWithJUnit with Neo4jWrapper with Embedd
 
   override def NodeIndexConfig = ("MyTestIndex", Map("provider" -> "lucene", "type" -> "fulltext")) :: Nil
 
-  sequential
-
   "Neo4jIndexProvider" should {
 
     ShutdownHookThread {

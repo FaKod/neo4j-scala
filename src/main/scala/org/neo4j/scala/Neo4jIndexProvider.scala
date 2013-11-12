@@ -45,7 +45,7 @@ trait Neo4jIndexProvider {
   /**
    * lazy initializes Indexes for Nodes
    */
-  private def getNodeIndexStore =
+  private def getNodeIndexStore = synchronized {
     nodeIndexStore match {
       case null =>
         nodeIndexStore = mutableMap[String, Index[Node]]()
@@ -59,6 +59,7 @@ trait Neo4jIndexProvider {
         nodeIndexStore
       case x => x
     }
+  }
 
   /**
    * lazy initializes Indexes for Relations
