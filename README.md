@@ -49,6 +49,10 @@ Or try to maven fetch it with a Github Maven Repo:
 Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scala/issues) to submit bug reports or feature requests.
 
 #Versions
+
+##0.3.0-M1-SNAPSHOT
+* refactoring from org.neo4j.scala to eu.fakod.neo4jscala. Preparing deployment to Maven Central
+
 ##0.2.0-M3-SNAPSHOT
 * Scala 2.10.3
 * Neo4j 1.9.4
