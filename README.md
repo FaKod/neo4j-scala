@@ -1,7 +1,7 @@
 #Neo4j Scala wrapper library
 
-The Neo4j Scala wrapper library allows you the [Neo4j open source graph database](http://neo4j.org/) through a
-domain-specific simplified language. It is written in Scala and is intended
+The Neo4j Scala wrapper library allows you use [Neo4j open source graph database](http://neo4j.org/) through a
+domain-specific language. It is written in Scala and is intended
 to be used in other Scala projects.
 
 This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project.
@@ -21,25 +21,22 @@ All discussions (if there are any) see Google Group [neo4j-scala](https://groups
     $ cd neo4j-scala
     $ mvn clean install
 
-Or try to maven fetch it with a Github Maven Repo:
+Or try to maven fetch it at maven:
 
 ```xml
 <repositories>
   <repository>
-    <id>fakod-snapshots</id>
-    <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
+    <id>sonatype-snapshots</id>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
   </repository>
-  <repository>
-    <id>fakod-releases</id>
-    <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/releases</url>
-  </repository>
+  ...
 </repositories>
 
 <dependencies>
   <dependency>
-    <groupId>org.neo4j</groupId>
+    <groupId>eu.fakod</groupId>
     <artifactId>neo4j-scala</artifactId>
-    <version>0.2.0-M2-SNAPSHOT</version>
+    <version>0.3.0-M1-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ```
@@ -52,6 +49,7 @@ Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scal
 
 ##0.3.0-M1-SNAPSHOT
 * refactoring from org.neo4j.scala to eu.fakod.neo4jscala. Preparing deployment to Maven Central
+* deployed snapshot to Sonatype
 
 ##0.2.0-M3-SNAPSHOT
 * Scala 2.10.3

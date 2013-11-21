@@ -2,6 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <groupId>eu.fakod</groupId>
     <artifactId>neo4j-scala</artifactId>
     <packaging>jar</packaging>
@@ -40,16 +46,10 @@
         </developer>
     </developers>
 
-    <distributionManagement>
-        <repository>
-            <id>repo</id>
-            <url>file:///${basedir}/../fakod-mvn-repo/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshot-repo</id>
-            <url>file:///${basedir}/../fakod-mvn-repo/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <scm>
+        <developerConnection>scm:git:git@github.com:FaKod/neo4j-scala.git</developerConnection>
+        <url>git@github.com:FaKod/neo4j-scala.git</url>
+    </scm>
 
 
     <repositories>
@@ -75,11 +75,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>fakod-snapshots</id>
-            <url>https://raw.github.com/FaKod/fakod-mvn-repo/master/snapshots</url>
-        </repository>
-
     </repositories>
 
     <dependencies>
