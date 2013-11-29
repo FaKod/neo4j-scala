@@ -12,7 +12,7 @@
     <artifactId>neo4j-scala</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
-    <version>0.3.0-M1-SNAPSHOT</version>
+    <version>0.3.0-M1</version>
     <description>Scala wrapper for Neo4j Graph Database</description>
     <url>http://github.com/fakod/neo4j-scala</url>
     <inceptionYear>2011</inceptionYear>
@@ -143,6 +143,10 @@
                 <version>3.1.0</version>
                 <configuration>
                     <recompileMode>incremental</recompileMode>
+                    <jvmArgs>
+                        <jvmArg>-Xms64m</jvmArg>
+                        <jvmArg>-Xmx2g</jvmArg>
+                    </jvmArgs>
                 </configuration>
                 <executions>
                     <execution>
