@@ -191,6 +191,7 @@
                                 <jvmArgs>
                                     <jvmArg>-Xms64m</jvmArg>
                                     <jvmArg>-Xmx1024m</jvmArg>
+                                    <jvmArg>-XX:MaxPermSize=512M</jvmArg>
                                 </jvmArgs>
                             </configuration>
                         </plugin>
