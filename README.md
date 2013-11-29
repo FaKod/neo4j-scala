@@ -27,7 +27,7 @@ All discussions (if there are any) see Google Group [neo4j-scala](https://groups
     $ cd neo4j-scala
     $ mvn clean install
 
-Or try to maven fetch it at maven:
+Or fetch it with Maven (the Sonatype Maven Repo is only needed if you want to use a SNAPSHOT version):
 
 ```xml
 <repositories>
@@ -41,8 +41,8 @@ Or try to maven fetch it at maven:
 <dependencies>
   <dependency>
     <groupId>eu.fakod</groupId>
-    <artifactId>neo4j-scala</artifactId>
-    <version>0.3.0-M1-SNAPSHOT</version>
+    <artifactId>neo4j-scala_2.10</artifactId>
+    <version>0.3.0</version>
   </dependency>
 </dependencies>
 ```
@@ -53,11 +53,12 @@ Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scal
 
 #Versions
 
-##0.3.0-M1-SNAPSHOT
+##0.3.0
 * Based on 0.2.0-M3-SNAPSHOT
 * **Refactoring from org.neo4j.scala to eu.fakod.neo4jscala**.
-* Deployed snapshot to Sonatype
 * "Old"" version is still in the 0.2.0-M git branch
+* using artifact id **neo4j-scala_2.10** now
+* deployed to central
 
 ##0.2.0-M3-SNAPSHOT
 * Scala 2.10.3
