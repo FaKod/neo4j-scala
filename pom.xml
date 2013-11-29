@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>eu.fakod</groupId>
-    <artifactId>neo4j-scala</artifactId>
+    <artifactId>neo4j-scala_2.10</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
     <version>0.3.0-SNAPSHOT</version>
