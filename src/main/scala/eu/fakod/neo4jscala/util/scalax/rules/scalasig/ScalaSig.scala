@@ -3,6 +3,7 @@ package scalax
 package rules
 package scalasig
 
+import scala.language.{implicitConversions, postfixOps}
 import ClassFileParser.{ConstValueIndex, Annotation}
 import scala.reflect.internal.pickling.ByteCodecs
 

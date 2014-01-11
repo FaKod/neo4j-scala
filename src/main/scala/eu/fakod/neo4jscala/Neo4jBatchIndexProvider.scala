@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala
 
+import scala.language.implicitConversions
 import org.neo4j.kernel.impl.batchinsert.BatchInserter
 import java.util.{Map => juMap}
 import org.neo4j.graphdb.index._

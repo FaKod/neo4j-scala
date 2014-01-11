@@ -2,6 +2,7 @@ package eu.fakod.neo4jscala.util
 package scalax
 package rules
 
+import scala.language.reflectiveCalls
 import scala.collection.mutable.HashMap
 
 trait MemoisableRules extends Rules {

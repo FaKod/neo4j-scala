@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala
 
+import scala.language.implicitConversions
 import org.neo4j.cypher.{PlanDescription, ExecutionResult, ExecutionEngine}
 import java.io.PrintWriter
 import org.neo4j.graphdb.PropertyContainer
@@ -73,7 +74,7 @@ trait Cypher {
 
   lazy val engine = new ExecutionEngine(ds.gds)
 
-  implicit def executeCypherQuery(query: String) = new {
+  implicit class CypherQueryExecutor(query: String) {
     def execute: TypedExecutionResult = new TypedExecutionResultImpl(engine.execute(query))
   }
 

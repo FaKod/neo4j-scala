@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala
 
+import scala.language.implicitConversions
 import org.neo4j.graphdb._
 
 /**
@@ -49,7 +50,7 @@ trait Neo4jWrapperImplicits {
   /**
    * for serialization
    */
-  implicit def nodeToCaseClass(pc: PropertyContainer) = new {
+  implicit class NodeToCaseClass(pc: PropertyContainer) {
     def toCC[T: Manifest]: Option[T] = Neo4jWrapper.toCC[T](pc)
 
     def toCCPossible[T: Manifest]: Boolean = Neo4jWrapper.toCCPossible[T](pc)

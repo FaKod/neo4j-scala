@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala
 
+import scala.language.implicitConversions
 import org.neo4j.graphdb.index.{Index, RelationshipIndex}
 import scala.collection.mutable.{Map => mutableMap}
 import collection.JavaConversions._

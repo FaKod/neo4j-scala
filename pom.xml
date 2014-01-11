@@ -142,6 +142,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <recompileMode>incremental</recompileMode>
+                    <addScalacArgs>-feature</addScalacArgs>
                     <jvmArgs>
                         <jvmArg>-Xms64m</jvmArg>
                         <jvmArg>-Xmx2g</jvmArg>

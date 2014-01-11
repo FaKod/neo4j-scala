@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala
 
+import scala.language.implicitConversions
 import org.neo4j.graphdb.{TraversalPosition, Node}
 import eu.fakod.rest.graphdb.traversal.RestOldTraverserWrapper
 
@@ -99,7 +100,7 @@ trait RestTypedTraverser extends TypedTraverserBase {
    * Enhances a Node with a doTraverse method
    * @param node start node
    */
-  protected implicit def nodeToTraverse(node: Node) = new {
+  protected implicit class TraversableNode(node: Node) {
 
     /**
      * creates a traversal Iterable starting with Node node

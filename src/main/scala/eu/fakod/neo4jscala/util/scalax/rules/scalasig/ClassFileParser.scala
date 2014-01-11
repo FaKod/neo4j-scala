@@ -6,6 +6,7 @@ package scalasig
 
 import java.io.IOException
 
+import scala.language.postfixOps
 import scala._
 import scala.Predef._
 
