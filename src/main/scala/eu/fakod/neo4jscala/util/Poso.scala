@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala.util
 
+import scala.language.existentials
 import scalax.rules.scalasig._
 import collection.mutable.{SynchronizedMap, ArrayBuffer, HashMap}
 

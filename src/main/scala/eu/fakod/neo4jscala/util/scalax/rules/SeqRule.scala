@@ -2,6 +2,8 @@ package eu.fakod.neo4jscala.util
 package scalax
 package rules
 
+import scala.language.{postfixOps, reflectiveCalls}
+
 /**
  * A workaround for the difficulties of dealing with
  * a contravariant 'In' parameter type...

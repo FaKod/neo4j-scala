@@ -2,6 +2,8 @@ package eu.fakod.neo4jscala.util
 package scalax
 package rules
 
+import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
+
 trait Name {
   def name: String
 

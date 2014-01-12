@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala
 
+import scala.language.implicitConversions
 import org.neo4j.graphdb.Traverser.Order
 import collection.mutable.Buffer
 import org.neo4j.graphdb._
@@ -126,7 +127,7 @@ trait TypedTraverser extends TypedTraverserBase {
    * Enhances a Node with a doTraverse method
    * @param node start node
    */
-  protected implicit def nodeToTraverse(node: Node) = new {
+  protected implicit class TraversableNode(node: Node) {
 
     /**
      * creates a traversal Iterable starting with Node node
@@ -153,11 +154,11 @@ trait TypedTraverser extends TypedTraverserBase {
                                (retEval: PartialFunction[(T, TraversalPosition), Boolean]): Iterable[T] = {
       val traverser = node.traverse(rb.getOrder,
         (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
-          case Some(x) if (stopEval.isDefinedAt(x, tp)) => stopEval(x, tp)
+          case Some(x) if stopEval.isDefinedAt((x, tp)) => stopEval((x, tp))
           case _ => false
         },
         (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
-          case Some(x) if (retEval.isDefinedAt(x, tp)) => retEval(x, tp)
+          case Some(x) if retEval.isDefinedAt((x, tp)) => retEval((x, tp))
           case _ => false
         }, rb.get: _*)
 
@@ -170,7 +171,7 @@ trait TypedTraverser extends TypedTraverserBase {
    * Enhances a List of Nodes with a doTraverse method
    * @param list list of nodes
    */
-  implicit def nodeListToTraverse(list: List[Node]) = new {
+  implicit class TraversableNodeList(list: List[Node]) {
 
     /**
      * creates a traversal Iterable starting traversals for every Node in the list
