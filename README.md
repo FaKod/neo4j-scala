@@ -53,6 +53,9 @@ Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scal
 
 #Versions
 
+##0.3.1-SNAPSHOT
+* Thanks to Alexander Korneev: fixes such warnings by replacing implicit methods that return structural types, with implicit classes. It also fixes some other warnings that arise when compiling the library itself.
+
 ##0.3.0
 * Based on 0.2.0-M3-SNAPSHOT
 * **Refactoring from org.neo4j.scala to eu.fakod.neo4jscala**.
