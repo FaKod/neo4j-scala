@@ -154,11 +154,11 @@ trait TypedTraverser extends TypedTraverserBase {
                                (retEval: PartialFunction[(T, TraversalPosition), Boolean]): Iterable[T] = {
       val traverser = node.traverse(rb.getOrder,
         (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
-          case Some(x) if (stopEval.isDefinedAt(x, tp)) => stopEval(x, tp)
+          case Some(x) if stopEval.isDefinedAt((x, tp)) => stopEval((x, tp))
           case _ => false
         },
         (tp: TraversalPosition) => tp.currentNode.toCC[T] match {
-          case Some(x) if (retEval.isDefinedAt(x, tp)) => retEval(x, tp)
+          case Some(x) if retEval.isDefinedAt((x, tp)) => retEval((x, tp))
           case _ => false
         }, rb.get: _*)
 

@@ -142,7 +142,11 @@
                 <version>3.1.0</version>
                 <configuration>
                     <recompileMode>incremental</recompileMode>
-                    <addScalacArgs>-feature</addScalacArgs>
+                    <args>
+                        <arg>-feature</arg>
+                        <arg>-Xlint</arg>
+                        <arg>-unchecked</arg>
+                    </args>
                     <jvmArgs>
                         <jvmArg>-Xms64m</jvmArg>
                         <jvmArg>-Xmx2g</jvmArg>
