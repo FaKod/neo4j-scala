@@ -28,7 +28,7 @@ trait Neo4jBatchIndexProvider extends Neo4jIndexProvider {
   /**
    * delegates to shutdown method
    */
-  def shutdownIndex(): Unit = batchIndexManager.shutdown()
+  def shutdownIndex() = batchIndexManager.shutdown
 
   /**
    * store for IndexManager
