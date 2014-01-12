@@ -68,7 +68,7 @@ class BatchIndexManager(bi: BatchInserter) extends IndexManager {
    * Shuts down this index provider and ensures that all indexes are fully
    * written to disk.
    */
-  def shutdown(): Unit = batchInserterIndexProvider.shutdown()
+  def shutdown() = batchInserterIndexProvider.shutdown
 
   def existsForNodes(indexName: String) = throw new NotImplementedException
 
@@ -103,7 +103,7 @@ private[neo4jscala] trait IndexCacheHelper {
   protected def addToCache(id: Long, key: String, value: AnyRef) =
     cache.getOrElseUpdate(id, HashMap[String, AnyRef]()) += ((key, value))
 
-  protected def cacheClear(): Unit = cache.clear()
+  protected def cacheClear() = cache.clear
 }
 
 /**
@@ -124,8 +124,8 @@ class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node]
   def updateOrAdd(entityId: Long, properties: Map[String, AnyRef]) = bii.updateOrAdd(entityId, properties)
 
   def flush() = {
-    cacheClear()
-    bii.flush()
+    cacheClear
+    bii.flush
   }
 
   def setCacheCapacity(key: String, size: Int) = bii.setCacheCapacity(key, size)
@@ -190,8 +190,8 @@ class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends
   def updateOrAdd(entityId: Long, properties: Map[String, AnyRef]) = bii.updateOrAdd(entityId, properties)
 
   def flush() = {
-    cacheClear()
-    bii.flush()
+    cacheClear
+    bii.flush
   }
 
   def setCacheCapacity(key: String, size: Int) = bii.setCacheCapacity(key, size)
