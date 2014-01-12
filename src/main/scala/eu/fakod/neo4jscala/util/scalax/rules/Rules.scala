@@ -68,7 +68,7 @@ trait Rules {
 
 /**A factory for rules that apply to a particular context.
  *
- * @requires S the context to which rules apply.
+ * requires S the context to which rules apply.
  *
  * @author Andrew Foggin
  *
