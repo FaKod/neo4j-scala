@@ -89,17 +89,28 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
     "be serializable with Test2" in {
       withTx { neo =>
         val o = Test2(1, 3.3, true)
-          val node = createNode(o)(neo)
-          val oo1: Test2 = Neo4jWrapper.deSerialize[Test2](node)
-          oo1 must beEqualTo(o)
+        val node = createNode(o)(neo)
+        val oo1: Test2 = Neo4jWrapper.deSerialize[Test2](node)
+        oo1 must beEqualTo(o)
 
-          val oo2 = node.toCC[Test2]
-          oo2 must beEqualTo(Option(o))
+        val oo2 = node.toCC[Test2]
+        oo2 must beEqualTo(Option(o))
 
-          val oo3 = node.toCC[NotTest]
-          oo3 must beEqualTo(None)
+        val oo3 = node.toCC[NotTest]
+        oo3 must beEqualTo(None)
 
-          Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
+        Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
+      }
+    }
+
+    "be serializable with labels" in {
+      withTx { neo =>
+        val o = Test2(1, 3.3, true)
+        val node = createNode(o, "A", "B")(neo)
+        node.labels must beEqualTo(List("A", "B"))
+
+        val oo2 = node.toCC[Test2]
+        oo2 must beEqualTo(Option(o))
       }
     }
 

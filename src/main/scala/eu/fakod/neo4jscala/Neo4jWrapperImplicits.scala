@@ -27,6 +27,11 @@ trait Neo4jWrapperImplicits {
   implicit def propertyContainer2RichPropertyContainer(propertyContainer: PropertyContainer) = new RichPropertyContainer(propertyContainer)
 
   /**
+   * label convenience methods
+   */
+  implicit def nodeLabeler(node: Node) = new NodeLabelMethods(node)
+
+  /**
    * creates a functional correct StopEvaluator instance
    */
   implicit def fn2StopEvaluator(e: TraversalPosition => Boolean) =

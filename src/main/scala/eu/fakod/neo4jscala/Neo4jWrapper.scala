@@ -190,6 +190,16 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
   }
 }
 
+private[neo4jscala] class NodeLabelMethods(node: Node) {
+  def labels = node.getLabels.map(_.name)
+
+  def addLabel(label: String) = node.addLabel(DynamicLabel.label(label))
+
+  def hasLabel(label: String) = node.hasLabel(DynamicLabel.label(label))
+
+  def removeLabel(label: String) = node.removeLabel(DynamicLabel.label(label))
+}
+
 /**
  * creates incoming and outgoing relationships
  */
