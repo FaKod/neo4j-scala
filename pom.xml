@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>eu.fakod</groupId>
-    <artifactId>neo4j-scala_2.11</artifactId>
+    <artifactId>neo4j-scala_2.10</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
     <version>0.3.1-SNAPSHOT</version>
@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.11.2</scala.version>
+        <scala.version>2.10.4</scala.version>
         <neo4j.version>2.1.2</neo4j.version>
         <neo4j.shell.version>2.1.2</neo4j.shell.version>
         <neo4j.cypher.version>2.1.2</neo4j.cypher.version>
@@ -96,7 +96,7 @@
 
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2_2.11</artifactId>
+            <artifactId>specs2_2.10</artifactId>
             <version>2.3.13</version>
             <scope>test</scope>
         </dependency>
@@ -139,7 +139,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.1.6</version>
                 <configuration>
                     <recompileMode>incremental</recompileMode>
                     <args>
@@ -191,7 +191,7 @@
                         <plugin>
                             <groupId>net.alchim31.maven</groupId>
                             <artifactId>scala-maven-plugin</artifactId>
-                            <version>3.2.0</version>
+                            <version>3.1.6</version>
                             <configuration>
                                 <jvmArgs>
                                     <jvmArg>-Xms64m</jvmArg>
@@ -266,7 +266,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.1.6</version>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
