@@ -81,7 +81,7 @@ trait RestTypedTraverser extends TypedTraverserBase {
    * @return String Java Script code snippet to be used for ReturnFilter or PruneEvaluator
    */
   def isOfCaseClass_JS[T: Manifest] =
-    ".getProperty('" + Neo4jWrapper.ClassPropertyName + "')==\"" + manifest[T].erasure.getName + "\";"
+    ".getProperty('" + Neo4jWrapper.ClassPropertyName + "')==\"" + manifest[T].runtimeClass.getName + "\";"
 
   /**
    * creates Java Script code for server side startNode type test

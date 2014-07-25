@@ -1,10 +1,13 @@
 package eu.fakod.neo4jscala
 
-import org.neo4j.kernel.EmbeddedGraphDatabase
-import org.neo4j.kernel.impl.batchinsert.{BatchInserter, BatchInserterImpl}
-import org.neo4j.rest.graphdb.RestGraphDatabase
+import scala.collection.JavaConversions._
+
 import java.net.URI
 import java.util.{HashMap => jMap}
+
+import org.neo4j.graphdb.factory.GraphDatabaseFactory
+import org.neo4j.unsafe.batchinsert.{BatchInserters, BatchInserterImpl, BatchInserter}
+import org.neo4j.rest.graphdb.RestGraphDatabase
 
 /**
  * Interface for a GraphDatabaseServiceProvider
@@ -36,9 +39,11 @@ trait EmbeddedGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider 
    * using an instance of an embedded graph database
    */
   val ds: DatabaseService = {
-    import collection.JavaConversions.mapAsJavaMap
     DatabaseServiceImpl(
-      new EmbeddedGraphDatabase(neo4jStoreDir, new jMap[String, String](configParams))
+      new GraphDatabaseFactory()
+        .newEmbeddedDatabaseBuilder(neo4jStoreDir)
+        .setConfig(mapAsJavaMap(configParams))
+        .newGraphDatabase
     )
   }
 }
@@ -52,10 +57,10 @@ private[neo4jscala] object SingeltonProvider {
   def apply(neo4jStoreDir: String, configParams: Map[String, String]) = ds match {
     case Some(x) => x
     case None =>
-      import collection.JavaConversions.mapAsJavaMap
-      ds = Some(DatabaseServiceImpl(new EmbeddedGraphDatabase(
-        neo4jStoreDir, new jMap[String, String](configParams)))
-      )
+      ds = Some(DatabaseServiceImpl(new GraphDatabaseFactory()
+          .newEmbeddedDatabaseBuilder(neo4jStoreDir)
+          .setConfig(new jMap[String, String](configParams))
+          .newGraphDatabase))
       ds.get
   }
 }
@@ -92,11 +97,13 @@ private[neo4jscala] object SingeltonBatchProvider {
   def apply(neo4jStoreDir: String) = inserter match {
     case Some(x) => x
     case None =>
-      inserter = Some(new BatchInserterImpl(neo4jStoreDir))
+      inserter = Some(BatchInserters.inserter(neo4jStoreDir))
       inserter.get
   }
 
-  lazy val ds: DatabaseService = DatabaseServiceImpl(inserter.get.getGraphDbService)
+  lazy val ds: DatabaseService = DatabaseServiceImpl(new GraphDatabaseFactory()
+    .newEmbeddedDatabaseBuilder(inserter.get.getStoreDir)
+    .newGraphDatabase)
 }
 
 /**

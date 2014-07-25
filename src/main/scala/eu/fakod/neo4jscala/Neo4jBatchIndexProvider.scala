@@ -1,14 +1,20 @@
 package eu.fakod.neo4jscala
 
 import scala.language.implicitConversions
-import org.neo4j.kernel.impl.batchinsert.BatchInserter
+import collection.JavaConversions._
+import collection.mutable.{SynchronizedMap, HashMap}
+import scala.collection.concurrent.{Map => ConcurrentMap}
+
 import java.util.{Map => juMap}
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
+
 import org.neo4j.graphdb.index._
 import org.neo4j.graphdb._
-import org.neo4j.index.impl.lucene.{AbstractIndexHits, LuceneBatchInserterIndexProvider}
-import collection.JavaConversions._
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
-import collection.mutable.{SynchronizedMap, ConcurrentMap, HashMap}
+import org.neo4j.graphdb.factory.GraphDatabaseFactory
+import org.neo4j.index.impl.lucene.AbstractIndexHits
+import org.neo4j.unsafe.batchinsert.{BatchInserterIndex, BatchInserterIndexProvider, BatchInserter, BatchInserters}
+import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider
+
 
 /**
  * provides Index access trait
@@ -111,13 +117,13 @@ private[neo4jscala] trait IndexCacheHelper {
  */
 class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node] with IndexCacheHelper {
 
-  private val gds = bi.getGraphDbService
+  private val gds = new GraphDatabaseFactory().newEmbeddedDatabase(bi.getStoreDir)
 
   /**
    * implicitly converts IndexHits[Long] to IndexHits[BatchNode]
    */
   private implicit def toNodeIndexHits(hits: IndexHits[java.lang.Long]): IndexHits[Node] = {
-    val listOfNodes = for (l <- hits.iterator) yield gds.getNodeById(l)
+    val listOfNodes = for (l <- hits.iterator) yield gds.getNodeById(l.asInstanceOf[Long])
     new ConstantScoreIterator[Node](listOfNodes.toList)
   }
 
@@ -177,13 +183,13 @@ class BatchIndex(bii: BatchInserterIndex, bi: BatchInserter) extends Index[Node]
  */
 class BatchRelationshipIndex(bii: BatchInserterIndex, bi: BatchInserter) extends RelationshipIndex with IndexCacheHelper {
 
-  private val gds = bi.getGraphDbService
+  private val gds = new GraphDatabaseFactory().newEmbeddedDatabase(bi.getStoreDir)
 
   /**
    * implicitly converts IndexHits[Long] to IndexHits[BatchRelationship]
    */
   private implicit def toRelationshipIndexHits(hits: IndexHits[java.lang.Long]): IndexHits[Relationship] = {
-    val listOfNodes = for (l <- hits.iterator) yield gds.getRelationshipById(l)
+    val listOfNodes = for (l <- hits.iterator) yield gds.getRelationshipById(l.asInstanceOf[Long])
     new ConstantScoreIterator[Relationship](listOfNodes.toList)
   }
 

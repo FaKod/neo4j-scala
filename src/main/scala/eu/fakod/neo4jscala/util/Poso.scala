@@ -30,7 +30,7 @@ object CaseClassDeserializer {
    * default behaviour for T == serialized class
    */
   def deserialize[T: Manifest](m: Map[String, AnyRef]): T =
-    deserialize[T](manifest[T].erasure, m)
+    deserialize[T](manifest[T].runtimeClass, m)
 
   /**
    * convenience method using class manifest
@@ -199,4 +199,3 @@ object CaseClassSigParser {
     case name => Class.forName(name)
   }
 }
-

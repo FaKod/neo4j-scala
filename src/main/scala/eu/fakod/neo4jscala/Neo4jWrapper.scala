@@ -4,7 +4,7 @@ import util.CaseClassDeserializer
 import collection.JavaConversions._
 import CaseClassDeserializer._
 import org.neo4j.graphdb._
-import index.IndexManager
+import org.neo4j.tooling.GlobalGraphOperations
 
 /**
  * Extend your class with this trait to get really neat new notation for creating
@@ -40,13 +40,14 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
   /**
    * creates a new Node from Database service
    */
-  def createNode(implicit ds: DatabaseService): Node = ds.gds.createNode
+  def createNode(labels: String*)(implicit ds: DatabaseService): Node =
+    ds.gds.createNode(labels.map(DynamicLabel.label(_)): _*)
 
   /**
    * convenience method to create and serialize a case class
    */
-  def createNode(cc: AnyRef)(implicit ds: DatabaseService): Node =
-    Neo4jWrapper.serialize(cc, createNode)
+  def createNode(cc: AnyRef, labels: String*)(implicit ds: DatabaseService): Node =
+    Neo4jWrapper.serialize(cc, createNode(labels: _*))
 
   /**
    * Looks up a node by id.
@@ -69,26 +70,33 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
     ds.gds.getRelationshipById(id)
 
   /**
-   * Returns the reference node, which is a "starting point" in the node
-   * space. Usually, a client attaches relationships to this node that leads
-   * into various parts of the node space. For more information about common
-   * node space organizational patterns, see the design guide at <a
-   * href="http://wiki.neo4j.org/content/Design_Guide"
-   * >wiki.neo4j.org/content/Design_Guide</a>.
-   *
-   * @return the reference node
-   * @throws NotFoundException if unable to get the reference node
-   */
-  def getReferenceNode(implicit ds: DatabaseService): Node =
-    ds.gds.getReferenceNode
-
-  /**
    * Returns all nodes in the node space.
    *
    * @return all nodes in the node space
    */
   def getAllNodes(implicit ds: DatabaseService): Iterable[Node] =
-    ds.gds.getAllNodes
+    GlobalGraphOperations.at(ds.gds).getAllNodes
+
+  /**
+   * Returns all nodes of the specified label.
+   *
+   * @param label the name of the label under which to confine the search
+   * @return all nodes with the specified label.
+   */
+  def getAllNodesWithLabel(label: String)(implicit ds: DatabaseService): Iterable[Node] =
+    GlobalGraphOperations.at(ds.gds).getAllNodesWithLabel(DynamicLabel.label(label))
+
+  /**
+   * Returns all nodes with the specified labels matching the given predicate.
+   *
+   * @param label the label name to which to confine the search.
+   * @param key the node property whose value to match.
+   * @param value the property value to match. Must adhere to Neo4j allowed property types.
+   * @return All nodes matching the given predicate with the supplied label.
+   */
+  def findNodesByLabelAndProperty(label: String, key: String, value: Any)(implicit ds: DatabaseService): Iterable[Node] =
+    ds.gds.findNodesByLabelAndProperty(DynamicLabel.label(label), key, value)
+
 
   /**
    * Returns all relationship types currently in the underlying store.
@@ -103,7 +111,7 @@ trait Neo4jWrapper extends GraphDatabaseServiceProvider with Neo4jWrapperImplici
    * @return all relationship types in the underlying store
    */
   def getRelationshipTypes(implicit ds: DatabaseService): Iterable[RelationshipType] =
-    ds.gds.getRelationshipTypes
+    GlobalGraphOperations.at(ds.gds).getAllRelationshipTypes
 
   /**
    * Shuts down Neo4j. After this method has been invoked, it's invalid to
@@ -153,7 +161,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
     }
 
   private def _toCCPossible[T: Manifest](pc: PropertyContainer): Option[Class[_]] = {
-    for (cpn <- pc[String](ClassPropertyName); c = Class.forName(cpn) if (manifest[T].erasure.isAssignableFrom(c)))
+    for (cpn <- pc[String](ClassPropertyName); c = Class.forName(cpn) if (manifest[T].runtimeClass.isAssignableFrom(c)))
       return Some(c)
     None
   }
@@ -177,7 +185,7 @@ object Neo4jWrapper extends Neo4jWrapperImplicits {
     toCC[T](pc) match {
       case Some(t) => t
       case _ => throw new IllegalArgumentException("given Case Class: " +
-        manifest[T].erasure.getName + " does not fit to serialized properties")
+        manifest[T].runtimeClass.getName + " does not fit to serialized properties")
     }
   }
 }

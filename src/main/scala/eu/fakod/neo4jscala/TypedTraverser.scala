@@ -198,8 +198,10 @@ trait TypedTraverser extends TypedTraverserBase {
     def doTraverse[T: Manifest](rb: RelationBuffer)
                                (stopEval: PartialFunction[(T, TraversalPosition), Boolean])
                                (retEval: PartialFunction[(T, TraversalPosition), Boolean]): Iterable[T] = {
-      val nodes = list.par.map {
-        _.doTraverse[T](rb)(stopEval)(retEval).toList
+      val nodes = list.par.map { node =>
+        withTx { neo =>
+            node.doTraverse[T](rb)(stopEval)(retEval).toList
+        }
       }.flatMap(l => l).distinct
 
       new Iterable[T] {

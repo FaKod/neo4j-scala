@@ -16,6 +16,8 @@ case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b:
 
 case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean, nullString: String = null)
 
+case class Test3(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
+
 case class NotTest(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
 trait PolyBase
@@ -67,47 +69,46 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
     }
 
     "be serializable with Test" in {
-      val o = Test("sowas", 1, 2, 3.3, 10, true, Array("2", "3"))
-      val node = withTx {
-        createNode(o)(_)
+      withTx { neo =>
+        val o = Test3("sowas", 1, 2, 3.3, 10, true)
+        val node = createNode(o)(neo)
+
+        val oo1 = Neo4jWrapper.deSerialize[Test3](node)
+        oo1 must beEqualTo(o)
+
+        val oo2 = node.toCC[Test3]
+        oo2 must beEqualTo(Option(o))
+
+        val oo3 = node.toCC[NotTest]
+        oo3 must beEqualTo(None)
+
+        Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
       }
-
-      val oo1 = Neo4jWrapper.deSerialize[Test](node)
-      oo1 must beEqualTo(o)
-
-      val oo2 = node.toCC[Test]
-      oo2 must beEqualTo(Option(o))
-
-      val oo3 = node.toCC[NotTest]
-      oo3 must beEqualTo(None)
-
-      Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
     }
 
     "be serializable with Test2" in {
-      val o = Test2(1, 3.3, true)
-      val node = withTx {
-        createNode(o)(_)
+      withTx { neo =>
+        val o = Test2(1, 3.3, true)
+          val node = createNode(o)(neo)
+          val oo1: Test2 = Neo4jWrapper.deSerialize[Test2](node)
+          oo1 must beEqualTo(o)
+
+          val oo2 = node.toCC[Test2]
+          oo2 must beEqualTo(Option(o))
+
+          val oo3 = node.toCC[NotTest]
+          oo3 must beEqualTo(None)
+
+          Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
       }
-
-      val oo1 = Neo4jWrapper.deSerialize[Test2](node)
-      oo1 must beEqualTo(o)
-
-      val oo2 = node.toCC[Test2]
-      oo2 must beEqualTo(Option(o))
-
-      val oo3 = node.toCC[NotTest]
-      oo3 must beEqualTo(None)
-
-      Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
     }
 
     "be possible with relations" in {
       val o = Test2(1, 3.3, true)
       withTx {
         implicit neo =>
-          val start = createNode
-          val end = createNode
+          val start = createNode()
+          val end = createNode()
           end <-- "foo" <-- start < o
 
           val rel = start.getSingleRelationship("foo", Direction.OUTGOING)
@@ -117,21 +118,18 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
     }
 
     "be possible to do polymorphic case classes" in {
-      val n1 = withTx {
-        createNode(Poly1("Poly1"))(_)
-      }
-      val n2 = withTx {
-        createNode(Poly2("Poly2"))(_)
-      }
+      withTx { neo =>
+        val n1 = createNode(Poly1("Poly1"))(neo)
+        val n2 = createNode(Poly2("Poly2"))(neo)
+        n1.toCC[PolyBase].get match {
+          case p1: Poly1 => println(p1)
+          case _ => failure
+        }
 
-      n1.toCC[PolyBase].get match {
-        case p1: Poly1 => println(p1)
-        case _ => failure
-      }
-
-      n2.toCC[PolyBase].get match {
-        case p2: Poly2 => println(p2)
-        case _ => failure
+        n2.toCC[PolyBase].get match {
+          case p2: Poly2 => println(p2)
+          case _ => failure
+        }
       }
       success
     }

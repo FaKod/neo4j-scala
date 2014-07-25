@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>eu.fakod</groupId>
-    <artifactId>neo4j-scala_2.10</artifactId>
+    <artifactId>neo4j-scala_2.11</artifactId>
     <packaging>jar</packaging>
     <name>Neo4j Scala</name>
     <version>0.3.1-SNAPSHOT</version>
@@ -18,11 +18,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.10.3</scala.version>
-        <neo4j.version>1.9.4</neo4j.version>
-        <neo4j.shell.version>1.9.4</neo4j.shell.version>
-        <neo4j.cypher.version>1.9.4</neo4j.cypher.version>
-        <neo4j.rest.version>1.9</neo4j.rest.version>
+        <scala.version>2.11.2</scala.version>
+        <neo4j.version>2.1.2</neo4j.version>
+        <neo4j.shell.version>2.1.2</neo4j.shell.version>
+        <neo4j.cypher.version>2.1.2</neo4j.cypher.version>
+        <neo4j.rest.version>2.0.1</neo4j.rest.version>
     </properties>
 
     <licenses>
@@ -90,14 +90,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2_2.10</artifactId>
-            <version>2.3.3</version>
+            <artifactId>specs2_2.11</artifactId>
+            <version>2.3.13</version>
             <scope>test</scope>
         </dependency>
 
@@ -139,7 +139,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <configuration>
                     <recompileMode>incremental</recompileMode>
                     <args>
@@ -181,17 +181,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.4</version>
                 <configuration>
                     <reportPlugins>
                         <plugin>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>2.2</version>
+                            <version>2.7</version>
                         </plugin>
                         <plugin>
                             <groupId>net.alchim31.maven</groupId>
                             <artifactId>scala-maven-plugin</artifactId>
-                            <version>3.1.6</version>
+                            <version>3.2.0</version>
                             <configuration>
                                 <jvmArgs>
                                     <jvmArg>-Xms64m</jvmArg>
@@ -205,10 +205,10 @@
 
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>2.5.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
                 <executions>
                     <execution>
@@ -223,7 +223,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.17</version>
                 <configuration>
                     <testFailureIgnore>false</testFailureIgnore>
                     <!--excludes>
@@ -238,7 +238,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>2.5</version>
                 <configuration>
                     <archive>
                         <addMavenDescriptor>false</addMavenDescriptor>
@@ -249,7 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -266,7 +266,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.6</version>
+                <version>3.2.0</version>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>

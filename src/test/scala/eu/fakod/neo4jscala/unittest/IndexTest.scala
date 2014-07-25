@@ -25,13 +25,13 @@ class IndexTestSpec extends SpecificationWithJUnit with Neo4jWrapper with Embedd
 
     "use the fulltext search index" in {
 
-      val nodeIndex = getNodeIndex("MyTestIndex").get
-
       withTx {
         implicit db =>
 
-        val theMatrix = createNode
-        val theMatrixReloaded = createNode
+        val nodeIndex = getNodeIndex("MyTestIndex").get
+
+        val theMatrix = createNode()
+        val theMatrixReloaded = createNode()
         theMatrixReloaded.setProperty("name", "theMatrixReloaded")
 
         nodeIndex +=(theMatrix, "title", "The Matrix")
@@ -45,10 +45,11 @@ class IndexTestSpec extends SpecificationWithJUnit with Neo4jWrapper with Embedd
 
     "remove items from index" in {
 
-      val nodeIndex = getNodeIndex("MyTestIndex").get
 
       withTx {
         implicit db =>
+
+        val nodeIndex = getNodeIndex("MyTestIndex").get
 
         val found = nodeIndex.query("title", "reloAdEd")
         val size = found.size

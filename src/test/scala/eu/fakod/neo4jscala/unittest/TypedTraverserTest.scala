@@ -24,8 +24,6 @@ class TypedTraverserSpec extends SpecificationWithJUnit with Neo4jWrapper with S
     implicit neo =>
       val nodeMap = for ((name, prof) <- nodes) yield (name, createNode(Test_Matrix(name, prof)))
 
-      getReferenceNode --> "ROOT" --> nodeMap("Neo")
-
       nodeMap("Neo") --> "KNOWS" --> nodeMap("Trinity")
       nodeMap("Neo") --> "KNOWS" --> nodeMap("Morpheus") --> "KNOWS" --> nodeMap("Trinity")
       nodeMap("Morpheus") --> "KNOWS" --> nodeMap("Cypher") --> "KNOWS" --> nodeMap("Agent Smith")
@@ -50,15 +48,17 @@ class TypedTraverserSpec extends SpecificationWithJUnit with Neo4jWrapper with S
     }
 
     "be able to traverse one Node" in {
-      val erg = nodeMap("Neo").doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
-        END_OF_GRAPH
-      } {
-        case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
-        case (x: Test_NonMatrix, _) => false
-      }.toList.sortWith(_.name < _.name)
+      withTx { implicit neo =>
+        val erg = nodeMap("Neo").doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY" -<- "FOO") {
+          END_OF_GRAPH
+        } {
+          case (x: Test_Matrix, tp) if (tp.depth == 2) => x.name.length > 2
+          case (x: Test_NonMatrix, _) => false
+        }.toList.sortWith(_.name < _.name)
 
-      erg must contain(Test_Matrix("Cypher", "Hacker"))
-      erg.length must be_==(1)
+        erg must contain(Test_Matrix("Cypher", "Hacker"))
+        erg.length must be_==(1)
+      }
     }
   }
 }

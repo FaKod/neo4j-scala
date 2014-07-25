@@ -43,8 +43,6 @@ object TheMatrix extends App with Neo4jWrapper with SingletonEmbeddedGraphDataba
     implicit neo =>
       val nodeMap = for ((name, prof) <- nodes) yield (name, createNode(Matrix(name, prof)))
 
-      getReferenceNode --> "ROOT" --> nodeMap("Neo")
-
       nodeMap("Neo") --> "KNOWS" --> nodeMap("Trinity")
       nodeMap("Neo") --> "KNOWS" --> nodeMap("Morpheus") --> "KNOWS" --> nodeMap("Trinity")
       nodeMap("Morpheus") --> "KNOWS" --> nodeMap("Cypher") --> "KNOWS" --> nodeMap("Agent Smith")
