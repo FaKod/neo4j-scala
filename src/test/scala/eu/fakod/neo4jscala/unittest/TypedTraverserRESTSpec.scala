@@ -1,5 +1,6 @@
 package eu.fakod.neo4jscala.unittest
 
+import scala.language.reflectiveCalls
 import org.specs2.mutable.SpecificationWithJUnit
 import java.net.URI
 import sys.ShutdownHookThread

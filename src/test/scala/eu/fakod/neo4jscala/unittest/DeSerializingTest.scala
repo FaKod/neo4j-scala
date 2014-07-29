@@ -12,11 +12,9 @@ import sys.ShutdownHookThread
  * @author Christopher Schmidt
  */
 
-case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean, ar: Array[String])
+case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
 case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean, nullString: String = null)
-
-case class Test3(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
 case class NotTest(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
@@ -33,7 +31,7 @@ class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
   "De- and Serializing" should {
 
     "able to create an instance from map" in {
-      val m = Map[String, AnyRef]("s" -> "sowas", "i" -> "1", "ji" -> "2", "d" -> (3.3).asInstanceOf[AnyRef], "l" -> "10", "b" -> "true", "ar" -> Array("1", "2"))
+      val m = Map[String, AnyRef]("s" -> "sowas", "i" -> "1", "ji" -> "2", "d" -> (3.3).asInstanceOf[AnyRef], "l" -> "10", "b" -> "true")
       val r = deserialize[Test](m)
 
       r.s must endWith("sowas")
@@ -42,18 +40,15 @@ class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
       r.d must_== (3.3)
       r.l must_== (10)
       r.b must_== (true)
-      r.ar must_== (Array("1", "2"))
-
     }
 
     "able to create a map from an instance" in {
-      val o = Test("sowas", 1, 2, 3.3, 10, true, Array("1", "2"))
+      val o = Test("sowas", 1, 2, 3.3, 10, true)
       val resMap = serialize(o)
 
-      resMap.size must_== 7
+      resMap.size must_== 6
       resMap.get("d").get mustEqual (3.3)
       resMap.get("b").get mustEqual (true)
-      resMap.get("ar").get mustEqual (Array("1", "2"))
     }
   }
 }
@@ -70,13 +65,13 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
 
     "be serializable with Test" in {
       withTx { neo =>
-        val o = Test3("sowas", 1, 2, 3.3, 10, true)
+        val o = Test("sowas", 1, 2, 3.3, 10, true)
         val node = createNode(o)(neo)
 
-        val oo1 = Neo4jWrapper.deSerialize[Test3](node)
+        val oo1 = Neo4jWrapper.deSerialize[Test](node)
         oo1 must beEqualTo(o)
 
-        val oo2 = node.toCC[Test3]
+        val oo2 = node.toCC[Test]
         oo2 must beEqualTo(Option(o))
 
         val oo3 = node.toCC[NotTest]
