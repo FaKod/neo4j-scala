@@ -16,6 +16,8 @@ case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b:
 
 case class Test2(jl: java.lang.Long, jd: java.lang.Double, jb: java.lang.Boolean, nullString: String = null)
 
+case class ArrayTest(ar: Array[String])
+
 case class NotTest(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
 
 trait PolyBase
@@ -95,6 +97,18 @@ class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with Em
         oo3 must beEqualTo(None)
 
         Neo4jWrapper.deSerialize[NotTest](node) must throwA[IllegalArgumentException]
+      }
+    }
+
+    "be serializable with ArrayTest" in {
+      withTx { implicit neo =>
+        val o = ArrayTest(Array("foo", "bar", "baz", "qux"))
+        val node = createNode(o)
+        val oo1: ArrayTest = Neo4jWrapper.deSerialize[ArrayTest](node)
+        val oo2 = node.toCC[ArrayTest]
+
+        oo1.ar must beEqualTo(o.ar)
+        oo2.get.ar must beEqualTo(o.ar)
       }
     }
 
