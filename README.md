@@ -55,6 +55,7 @@ Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scal
 
 ##0.3.1-SNAPSHOT
 * Thanks to Alexander Korneev: fixes such warnings by replacing implicit methods that return structural types, with implicit classes. It also fixes some other warnings that arise when compiling the library itself.
+* Thanks to Stephen Muss: Bumped Version to 2.1.3 and added support for nodes with labels. Unfortunately, Neo4j mirrored class org.neo4j.rest.graphdb.traversal.WrappingResourceIterator in Neo4js Kernel package (neo4j-contrib/java-rest-binding#70). Thats why I got a a IllegalAccessError. As a **workaround** I placed the neo4j-rest-graphdb dependency before the one of the neo4j-kernel.
 
 ##0.3.0
 * Based on 0.2.0-M3-SNAPSHOT
