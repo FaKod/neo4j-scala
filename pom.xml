@@ -101,6 +101,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- REST Binding -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-rest-graphdb</artifactId>
+            <version>${neo4j.rest.version}</version>
+        </dependency>
+
+
         <!-- Neo4j graph database -->
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -116,13 +124,6 @@
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-shell</artifactId>
             <version>${neo4j.shell.version}</version>
-        </dependency>
-
-        <!-- REST Binding -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-rest-graphdb</artifactId>
-            <version>${neo4j.rest.version}</version>
         </dependency>
 
         <!-- Cypher -->
