@@ -146,7 +146,7 @@ nodeIndex -= (Node_A)
 
 
 Using this wrapper, this is how creating two relationships can look in Scala. 
-The String are automatically converted into Dynamic Relationsships:
+The String are automatically converted into Dynamic Relationships:
 
 ```scala
 start --> "KNOWS" --> intermediary --> "KNOWS" --> end
