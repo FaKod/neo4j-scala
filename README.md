@@ -175,7 +175,7 @@ start[String]("foo") match {
 
 ##Using Case Classes
 
-Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the properties are stored as key/values to the Property Container, thai can be a Node or a Relation. However, Working types are limited to basic types like String, integer etc.
+Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the properties are stored as key/values to the Property Container, they can be a Node or a Relation. However, Working types are limited to basic types like String, Integer etc.
 
 ```scala
 case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
@@ -302,7 +302,7 @@ Where startWithNodes is of type List[Node].
 
 ##REST Typed Traversing 
 
-The main diffenrence between the non REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
+The main difference between the non-REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
 
 
 ###Prune Evaluator and Max Depth
