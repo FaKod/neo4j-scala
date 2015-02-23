@@ -1,13 +1,5 @@
 #Neo4j Scala wrapper library
 
-```
-Version 0.3.0...:
-- I had to refactor the packages to my own domain, to allow deployment to Sonatype Maven repository.
-- Snapshots aren't synchronized with Central. So use Sonatype repo for now (see below)
-- "old" version is still in the 0.2.0-M git branch.
-- further developments in master branch
-```
-
 The Neo4j Scala wrapper library allows you use [Neo4j open source graph database](http://neo4j.org/) through a domain-specific language.
 
 This wrapper is mostly based on the work done by [Martin Kleppmann](http://twitter.com/martinkl) in his [Scala implementation of RESTful JSON HTTP resources on top of the Neo4j graph database and Jersey](http://github.com/ept/neo4j-resources) project.
@@ -50,37 +42,6 @@ Or fetch it with Maven (the Sonatype Maven Repo is only needed if you want to us
 ##Troubleshooting
 
 Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scala/issues) to submit bug reports or feature requests.
-
-#Versions
-
-##0.3.1-SNAPSHOT
-* Thanks to Alexander Korneev: fixes such warnings by replacing implicit methods that return structural types, with implicit classes. It also fixes some other warnings that arise when compiling the library itself.
-* Thanks to Stephen Muss: Bumped Version to 2.1.3 and added support for nodes with labels. Unfortunately, Neo4j mirrored class org.neo4j.rest.graphdb.traversal.WrappingResourceIterator in Neo4js Kernel package (neo4j-contrib/java-rest-binding#70). Thats why I got a a IllegalAccessError. As a **workaround** I placed the neo4j-rest-graphdb dependency before the one of the neo4j-kernel.
-
-##0.3.0
-* Based on 0.2.0-M3-SNAPSHOT
-* **Refactoring from org.neo4j.scala to eu.fakod.neo4jscala**.
-* "Old"" version is still in the 0.2.0-M git branch
-* using artifact id **neo4j-scala_2.10** now
-* deployed to central
-
-##0.2.0-M3-SNAPSHOT
-* Scala 2.10.3
-* Neo4j 1.9.4
-
-##0.2.0-M2-SNAPSHOT
-
-* Switched to Neo4j Version 1.8
-* Added simple Cypher Support
-* Added programmatic access to Configuration Parameter
-* Using incremental Scala compiler now
-
-##0.2.0-M1
-
-* Switched to Neo4j Version 1.7
-* Introducing Typed Traverser for type safe traversals
-* Added REST Graph DB Provider to support REST based server access
-* Introducing REST Typed Traverser with support for server side Prune Evaluator and Return Filter
 
 #Using this library
 
@@ -146,7 +107,7 @@ nodeIndex -= (Node_A)
 
 
 Using this wrapper, this is how creating two relationships can look in Scala. 
-The String are automatically converted into Dynamic Relationsships:
+The String are automatically converted into Dynamic Relationships:
 
 ```scala
 start --> "KNOWS" --> intermediary --> "KNOWS" --> end
@@ -175,7 +136,7 @@ start[String]("foo") match {
 
 ##Using Case Classes
 
-Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the properties are stored as key/values to the Property Container, thai can be a Node or a Relation. However, Working types are limited to basic types like String, integer etc.
+Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the properties are stored as key/values to the Property Container, they can be a Node or a Relation. However, Working types are limited to basic types like String, Integer etc.
 
 ```scala
 case class Test(s: String, i: Int, ji: java.lang.Integer, d: Double, l: Long, b: Boolean)
@@ -302,7 +263,7 @@ Where startWithNodes is of type List[Node].
 
 ##REST Typed Traversing 
 
-The main diffenrence between the non REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
+The main difference between the non-REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
 
 
 ###Prune Evaluator and Max Depth
