@@ -34,9 +34,22 @@ Or fetch it with Maven (the Sonatype Maven Repo is only needed if you want to us
   <dependency>
     <groupId>eu.fakod</groupId>
     <artifactId>neo4j-scala_2.10</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
   </dependency>
 </dependencies>
+```
+
+If you use SBT:
+
+```
+resolvers ++= Seq(
+  "Neo4j Scala Wrapper" at "https://oss.sonatype.org/content/repositories/snapshots/",
+  "Neo4j Repositories" at "http://m2.neo4j.org/content/repositories/releases"
+)
+
+libraryDependencies ++= Seq(
+  "eu.fakod" % "neo4j-scala_2.10" % "0.3.1-SNAPSHOT"
+)
 ```
 
 ##Troubleshooting
