@@ -19,26 +19,6 @@ All discussions (if there are any) see Google Group [neo4j-scala](https://groups
     $ cd neo4j-scala
     $ mvn clean install
 
-Or fetch it with Maven (the Sonatype Maven Repo is only needed if you want to use a SNAPSHOT version):
-
-```xml
-<repositories>
-  <repository>
-    <id>sonatype-snapshots</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-  </repository>
-  ...
-</repositories>
-
-<dependencies>
-  <dependency>
-    <groupId>eu.fakod</groupId>
-    <artifactId>neo4j-scala_2.10</artifactId>
-    <version>0.3.1-SNAPSHOT</version>
-  </dependency>
-</dependencies>
-```
-
 If you use SBT:
 
 ```
@@ -48,7 +28,8 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "eu.fakod" % "neo4j-scala_2.10" % "0.3.1-SNAPSHOT"
+  "eu.fakod" % "neo4j-scala_2.10" % "0.3.1-SNAPSHOT",
+  "com.sun.jersey" % "jersey-core" % "1.9" // You need this if you use REST Provider
 )
 ```
 
