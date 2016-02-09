@@ -3,11 +3,11 @@ organization := "eu.fakod"
 
 name := "neo4j-scala"
 
-version := "0.3.1-SNAPSHOT"
+version := "0.3.2-SNAPSHOT"
 
 description := "Scala wrapper for Neo4j Graph Database"
 
-crossScalaVersions := Seq("2.11.7", "2.10.4", "2.12.0-M3")
+crossScalaVersions := Seq("2.11.7", "2.10.4")
 
 homepage := Some(url("http://github.com/fakod/neo4j-scala"))
 
@@ -43,9 +43,9 @@ libraryDependencies ++= {
   )
 }
 
-publishTo <<= version { v: String =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT"))
+  if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
@@ -64,21 +64,28 @@ pomExtra := (
     <system>github</system>
     <url>https://github.com/FaKod/neo4j-scala/issues</url>
   </issueManagement>
-  <developers>
-    <developer>
-      <id>FaKod</id>
-      <name>Christopher Schmidt</name>
-      <email>info [at] FaKod.EU</email>
-      <timezone>+1</timezone>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
-  <scm>
-    <url>git@github.com:FaKod/neo4j-scala.git</url>
-    <connection>scm:git:git@github.com:FaKod/neo4j-scala.git</connection>
-    <developerConnection>scm:git:git@github.com:FaKod/neo4j-scala.git</developerConnection>
-  </scm>
-)
+    <licenses>
+      <license>
+        <name>the Apache License, ASL Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <developers>
+      <developer>
+        <id>FaKod</id>
+        <name>Christopher Schmidt</name>
+        <email>info [at] FaKod.EU</email>
+        <timezone>+1</timezone>
+        <roles>
+          <role>developer</role>
+        </roles>
+      </developer>
+    </developers>
+    <scm>
+      <url>git@github.com:FaKod/neo4j-scala.git</url>
+      <connection>scm:git:git@github.com:FaKod/neo4j-scala.git</connection>
+      <developerConnection>scm:git:git@github.com:FaKod/neo4j-scala.git</developerConnection>
+    </scm>
+  )
 
