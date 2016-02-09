@@ -1,5 +1,7 @@
 package eu.fakod.neo4jscala.unittest
 
+import java.util.UUID
+
 import org.neo4j.graphdb._
 import org.specs2.mutable.SpecificationWithJUnit
 import eu.fakod.neo4jscala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
@@ -11,7 +13,7 @@ import sys.ShutdownHookThread
 
 class Neo4jWrapperSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
-  def neo4jStoreDir = "/tmp/temp-neo-test"
+  def neo4jStoreDir = "./target/temp-neo-test" + UUID.randomUUID()
 
   "NeoWrapper" should {
 

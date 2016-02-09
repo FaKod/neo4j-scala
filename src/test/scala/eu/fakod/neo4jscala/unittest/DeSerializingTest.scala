@@ -1,5 +1,7 @@
 package eu.fakod.neo4jscala.unittest
 
+import java.util.UUID
+
 import org.specs2.mutable.SpecificationWithJUnit
 import eu.fakod.neo4jscala.{EmbeddedGraphDatabaseServiceProvider, Neo4jWrapper}
 import eu.fakod.neo4jscala.util.CaseClassDeserializer
@@ -57,7 +59,7 @@ class DeSerializingWithoutNeo4jSpec extends SpecificationWithJUnit {
 
 class DeSerializingSpec extends SpecificationWithJUnit with Neo4jWrapper with EmbeddedGraphDatabaseServiceProvider {
 
-  def neo4jStoreDir = "/tmp/temp-neo-test2"
+  def neo4jStoreDir = "./target/temp-neo-test2" + UUID.randomUUID()
 
   "Node" should {
 

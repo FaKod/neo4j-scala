@@ -1,5 +1,7 @@
 package eu.fakod.neo4jscala.unittest
 
+import java.util.UUID
+
 import org.specs2.mutable.SpecificationWithJUnit
 import eu.fakod.neo4jscala._
 import sys.ShutdownHookThread
@@ -8,7 +10,7 @@ import eu.fakod.neo4jscala.Test_Matrix
 
 class CypherSpec extends SpecificationWithJUnit with Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with Cypher {
 
-  def neo4jStoreDir = "/tmp/temp-neo-CypherTest"
+  def neo4jStoreDir = "./target/temp-neo-CypherTest" + UUID.randomUUID()
 
   ShutdownHookThread {
     shutdown(ds)

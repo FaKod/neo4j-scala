@@ -1,12 +1,14 @@
 package eu.fakod.neo4jscala.unittest
 
+import java.util.UUID
+
 import org.specs2.mutable.SpecificationWithJUnit
 import sys.ShutdownHookThread
 import eu.fakod.neo4jscala._
 
 class TypedTraverserSpec extends SpecificationWithJUnit with Neo4jWrapper with SingletonEmbeddedGraphDatabaseServiceProvider with TypedTraverser {
 
-  def neo4jStoreDir = "/tmp/temp-neo-TypedTraverserSpec"
+  def neo4jStoreDir = "./target/temp-neo-TypedTraverserSpec" + UUID.randomUUID()
 
   ShutdownHookThread {
     shutdown(ds)
