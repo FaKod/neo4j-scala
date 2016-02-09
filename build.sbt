@@ -26,9 +26,6 @@ libraryDependencies ++= {
   Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
 
-    // REST Binding -->
-    "org.neo4j" % "neo4j-rest-graphdb" % neo4jRestVersion,
-
     // Neo4j graph database
     "org.neo4j" % "neo4j-kernel" % neo4jVersion,
     "org.neo4j" % "neo4j-lucene-index" % neo4jVersion,

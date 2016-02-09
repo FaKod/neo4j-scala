@@ -6,8 +6,7 @@ import java.net.URI
 import java.util.{HashMap => jMap}
 
 import org.neo4j.graphdb.factory.GraphDatabaseFactory
-import org.neo4j.unsafe.batchinsert.{BatchInserters, BatchInserterImpl, BatchInserter}
-import org.neo4j.rest.graphdb.RestGraphDatabase
+import org.neo4j.unsafe.batchinsert.{BatchInserters, BatchInserter}
 
 /**
  * Interface for a GraphDatabaseServiceProvider
@@ -127,31 +126,4 @@ trait BatchGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider {
    * using an instance of an embedded graph database
    */
   val ds: DatabaseService = SingeltonBatchProvider.ds
-}
-
-/**
- * The Java binding for the Neo4j Server REST API wraps the REST calls
- * behind the well known GraphDatabaseService API
- */
-trait RestGraphDatabaseServiceProvider extends GraphDatabaseServiceProvider {
-
-  /**
-   * has to be overwritten to define the server location
-   * @return URI server URI
-   */
-  def uri: URI
-
-  /**1
-   * has to be overwritten to define username and password
-   * @return Option[(String, String)] user and password as Option of Strings
-   */
-  def userPw: Option[(String, String)] = None
-
-  /**
-   * creates a new instance of a REST Graph Database Service
-   */
-  val ds: DatabaseService = DatabaseServiceImpl(userPw match {
-    case None => new RestGraphDatabase(uri.toString)
-    case Some((u, p)) => new RestGraphDatabase(uri.toString, u, p)
-  })
 }
