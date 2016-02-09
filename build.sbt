@@ -7,7 +7,7 @@ version := "0.3.2-SNAPSHOT"
 
 description := "Scala wrapper for Neo4j Graph Database"
 
-crossScalaVersions := Seq("2.11.7", "2.10.4")
+crossScalaVersions := Seq("2.10.4")
 
 homepage := Some(url("http://github.com/fakod/neo4j-scala"))
 
@@ -18,10 +18,9 @@ licenses := Seq(
 resolvers += "Neo4j Maven 2 repository" at "https://m2.neo4j.org/content/repositories/releases"
 
 libraryDependencies ++= {
-  val neo4jVersion = "2.1.3"
-  val neo4jShellVersion = "2.1.3"
-  val neo4jCypherVersion = "2.1.3"
-  val neo4jRestVersion = "2.0.1"
+  val neo4jVersion = "2.2.2"
+  val neo4jShellVersion = "2.2.2"
+  val neo4jCypherVersion = "2.2.2"
 
   Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
