@@ -3,11 +3,11 @@ organization := "eu.fakod"
 
 name := "neo4j-scala"
 
-version := "0.3.2-SNAPSHOT"
+version := "0.3.2"
 
 description := "Scala wrapper for Neo4j Graph Database"
 
-crossScalaVersions := Seq("2.10.4")
+crossScalaVersions := Seq("2.10.5")
 
 homepage := Some(url("http://github.com/fakod/neo4j-scala"))
 
@@ -56,32 +56,19 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
 pomExtra := (
-  <issueManagement>
-    <system>github</system>
-    <url>https://github.com/FaKod/neo4j-scala/issues</url>
-  </issueManagement>
-    <licenses>
-      <license>
-        <name>the Apache License, ASL Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <developers>
-      <developer>
-        <id>FaKod</id>
-        <name>Christopher Schmidt</name>
-        <email>info [at] FaKod.EU</email>
-        <timezone>+1</timezone>
-        <roles>
-          <role>developer</role>
-        </roles>
-      </developer>
-    </developers>
+  <developers>
+    <developer>
+      <id>FaKod</id>
+      <name>Christopher Schmidt</name>
+      <timezone>+1</timezone>
+      <email>info [at] FaKod.EU</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
     <scm>
-      <url>git@github.com:FaKod/neo4j-scala.git</url>
-      <connection>scm:git:git@github.com:FaKod/neo4j-scala.git</connection>
       <developerConnection>scm:git:git@github.com:FaKod/neo4j-scala.git</developerConnection>
+      <url>git@github.com:FaKod/neo4j-scala.git</url>
     </scm>
   )
-

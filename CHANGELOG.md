@@ -1,4 +1,4 @@
-##0.3.2-SNAPSHOT
+##0.3.2
 * Thanks to Ouven switched to SBT
 * Bumped versions to 2.2.2
 * prepared for cross builds -> ArtifactID now neo4j-scala_2.10
