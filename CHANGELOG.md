@@ -1,3 +1,8 @@
+##0.3.2-SNAPSHOT
+* Thanks to Ouven switched to SBT
+* Bumped versions to 2.2.2
+* prepared for cross builds -> ArtifactID now neo4j-scala_2.10
+* but, Cypher does not work with Scala 2.11 and removed the discontinued REST support
 
 ##0.3.1-SNAPSHOT
 * Thanks to Alexander Korneev: fixes such warnings by replacing implicit methods that return structural types, with implicit classes. It also fixes some other warnings that arise when compiling the library itself.

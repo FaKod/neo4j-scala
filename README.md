@@ -63,7 +63,7 @@ Available are:
 * EmbeddedGraphDatabaseServiceProvider
 * SingletonEmbeddedGraphDatabaseServiceProvider (singleton version)
 * BatchGraphDatabaseServiceProvider (use it with Neo4jBatchIndexProvider)
-* RestGraphDatabaseServiceProvider uses the REST binding
+* REMOVED -> RestGraphDatabaseServiceProvider uses the REST binding
 
 ##Transaction Wrapping
 
@@ -261,7 +261,7 @@ val erg1 = startWithNodes.doTraverse[MatrixBase](follow -<- "KNOWS") {
 Where startWithNodes is of type List[Node].
 
 
-##REST Typed Traversing 
+##REMOVED -> REST Typed Traversing <-- REMOVED
 
 The main difference between the non-REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
 
