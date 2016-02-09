@@ -7,9 +7,7 @@ version := "0.3.1-SNAPSHOT"
 
 description := "Scala wrapper for Neo4j Graph Database"
 
-scalaVersion := "2.11.7"
-
-crossScalaVersions := Seq("2.10.4", "2.12.0-M3")
+crossScalaVersions := Seq("2.11.7", "2.10.4", "2.12.0-M3")
 
 homepage := Some(url("http://github.com/fakod/neo4j-scala"))
 
