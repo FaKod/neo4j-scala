@@ -3,7 +3,7 @@ organization := "eu.fakod"
 
 name := "neo4j-scala"
 
-version := "0.3.3"
+version := "0.3.4-SNAPSHOT"
 
 description := "Scala wrapper for Neo4j Graph Database"
 
