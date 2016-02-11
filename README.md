@@ -1,4 +1,4 @@
-#Neo4j Scala wrapper library
+#Neo4j Scala wrapper library [![Build Status](https://travis-ci.org/FaKod/neo4j-scala.png?branch=master)](https://travis-ci.org/FaKod/neo4j-scala)
 
 The Neo4j Scala wrapper library allows you use [Neo4j open source graph database](http://neo4j.org/) through a domain-specific language.
 
