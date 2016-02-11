@@ -1,3 +1,8 @@
+##0.3.3
+* no code change
+* Scala 2.10 now uses Neo4j 2.2.2
+* Scala 2.11 now uses Neo4j 2.3.2
+
 ##0.3.2
 * Thanks to Ouven switched to SBT
 * Bumped versions to 2.2.2
