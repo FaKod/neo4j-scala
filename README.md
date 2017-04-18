@@ -1,4 +1,4 @@
-#Neo4j Scala wrapper library
+# Neo4j Scala wrapper library
 
 The Neo4j Scala wrapper library allows you use [Neo4j open source graph database](http://neo4j.org/) through a domain-specific language.
 
@@ -13,7 +13,7 @@ You may find [Neo4j-Spatial-Scala](http://github.com/FaKod/neo4j-spatial-scala) 
 All discussions (if there are any) see Google Group [neo4j-scala](https://groups.google.com/forum/#!forum/neo4j-scala)
 
 
-##Building
+## Building
 
     $ git clone git://github.com/FaKod/neo4j-scala.git
     $ cd neo4j-scala
@@ -39,13 +39,13 @@ Or fetch it with Maven (the Sonatype Maven Repo is only needed if you want to us
 </dependencies>
 ```
 
-##Troubleshooting
+## Troubleshooting
 
 Please consider using [Github issues tracker](http://github.com/fakod/neo4j-scala/issues) to submit bug reports or feature requests.
 
-#Using this library
+# Using this library
 
-##Graph Database Service Provider
+## Graph Database Service Provider
 
 Neo4j Scala Wrapper needs a Graph Database Service Provider, it has to implement GraphDatabaseServiceProvider trait.
 One possibility is to use the EmbeddedGraphDatabaseServiceProvider for embedded Neo4j instances where you simply have to define a Neo4j storage directory.
@@ -65,7 +65,7 @@ Available are:
 * BatchGraphDatabaseServiceProvider (use it with Neo4jBatchIndexProvider)
 * REMOVED -> RestGraphDatabaseServiceProvider uses the REST binding
 
-##Transaction Wrapping
+## Transaction Wrapping
 
 Transactions are wrapped by withTx. After leaving the "scope" success is called (or rollback if an exception is raised):
 
@@ -78,7 +78,7 @@ withTx {
 }
 ```
 
-##Using an Index
+## Using an Index
 
 Neo4j provides indexes for nodes and relationships. The indexes can be configured by mixing in the Neo4jIndexProvider trait. See [Indexing](http://docs.neo4j.org/chunked/stable/indexing.html)
 
@@ -103,7 +103,7 @@ nodeIndex += (Node_A, "title", "The Matrix")
 nodeIndex -= (Node_A)
 ```
 
-##Relations
+## Relations
 
 
 Using this wrapper, this is how creating two relationships can look in Scala. 
@@ -120,7 +120,7 @@ To return the Property Container for the Relation Object use the '<' method:
 val relation = start --> "KNOWS" --> end <
 ```
 
-##Properties
+## Properties
 
 And this is how getting and setting properties on a node or relationship looks like :
 
@@ -134,7 +134,7 @@ start[String]("foo") match {
 }
 ```
 
-##Using Case Classes
+## Using Case Classes
 
 Neo4j provides storing keys (String) and values (Object) into Nodes. To store Case Classes the properties are stored as key/values to the Property Container, they can be a Node or a Relation. However, Working types are limited to basic types like String, Integer etc.
 
@@ -161,7 +161,7 @@ withTx {
  }
 ```
 
-##Traversing
+## Traversing
 
 Besides, the neo4j scala binding makes it possible to write stop and returnable evaluators in a functional style :
 
@@ -175,12 +175,12 @@ start.traverse(Traverser.Order.BREADTH_FIRST, StopEvaluator.END_OF_GRAPH, (tp : 
 "foo", Direction.OUTGOING)
 ```
 
-##Typed Traversing
+## Typed Traversing
 
 The traverser mentioned above processes and returns Nodes resp. Property Container. To allow a more type safe traverser the TypedTraverser was introduced. The basic semantic is that you have to define the type (a case class) that should be returned (while inheritance is respected).
 But first define Relation Types and Directions:
 
-###Relation Types and Direction
+### Relation Types and Direction
 
 To define relation types and directions use the follow method. Some examples
 
@@ -200,7 +200,7 @@ myNode.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
 }
 ```
 
-###Return and Stop Evaluator
+### Return and Stop Evaluator
 
 **block1** is the Stop Evaluator and **block2** the Return Evaluator, both of type PartialFunction[(T, TraversalPosition), Boolean]. Where T is MatrixBase in case of the example, TraversalPosition from the traverser and Boolean as return type. 
 
@@ -220,7 +220,7 @@ node.doTraverse[MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODED_BY") {
 
 Assuming that Matrix and NonMatrix are inherited from MatrixBase the traverser will handle that correctly. X and y only matches if the given type can be marshaled to Matrix or NonMatrix and assigned from MatrixBase. Additionally, you can use the TraversalPosition in both case statements or ignore it with '_'. The example defines that depth must be 2 and the Matrix.name parameter must be of length > 2. NonMatrix classes are not returned. The Stop Evaluator always returns false.
 
-###Iterable[T]
+### Iterable[T]
 
 The example above returns an Iterable[MatrixBase]. This allows to use the powerful Scala collections, f.e.:
 
@@ -245,7 +245,7 @@ val list:List[MatrixBase] = node.doTraverse[MatrixBase](follow -<- "KNOWS") {
 }.toList.sortWith(_.name < _.name)
 ```
 
-###Using a List of Nodes
+### Using a List of Nodes
 
 Instead of one Node you can use a List of Nodes (List[Node]). The given traverser is started multithreaded for every node in the List. The resulting threads are joined, the result-lists are appended and Node duplicates removed. F.e:
 
@@ -261,12 +261,12 @@ val erg1 = startWithNodes.doTraverse[MatrixBase](follow -<- "KNOWS") {
 Where startWithNodes is of type List[Node].
 
 
-##REMOVED -> REST Typed Traversing <-- REMOVED
+## REMOVED -> REST Typed Traversing <-- REMOVED
 
 The main difference between the non-REST Typed Traverser is the ability to provide server side Prune Evaluator and Return Filter. This is important because otherwise all traversed data will be transfered to the client. This is possible but not always the best solution.
 
 
-###Prune Evaluator and Max Depth
+### Prune Evaluator and Max Depth
 
 The **PruneEvaluator** defines where to stop traversing relations. It has to be Java Script code that can use the position instance of type org.neo4j.graphdb.Path.
  
@@ -275,7 +275,7 @@ The **PruneEvaluator** defines where to stop traversing relations. It has to be 
 * a max depth of 1 is used and 
 * if a "prune evaluator" is specified instead of a max depth, no max depth limit is set.
 
-####Examples for Prune Evaluator / MaxDepth
+#### Examples for Prune Evaluator / MaxDepth
 Using the case class PruneEvaluator ("JAVASCRIPT" is dafault, "false" is Java Script code):
   
 ```scala    
@@ -306,14 +306,14 @@ startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODE
 }.toList.sortWith(_.name < _.name)
 ```
 
-###Return Filter
+### Return Filter
 
 The Return Filter has the same semantic as the Return Evaluator. It can be used as with the normal TypedTraverser, can be used with the Java Script and with two builtin functions:
 
 * ReturnAllButStartNode
 * ReturnAll
 
-####Examples for Return Filter
+#### Examples for Return Filter
 Traversing with Max Depth 10 and all nodes except start node:
 
 ```scala
@@ -344,7 +344,7 @@ startNode.doTraverse[Test_MatrixBase](follow(BREADTH_FIRST) -- "KNOWS" ->- "CODE
   ).toList.sortWith(_.name < _.name)
 ```
 
-##Simple Cypher Support
+## Simple Cypher Support
 
 The following example shows how to use Cypher together with typed results. In this case "execute" returns the case class Test_Matrix.
 
@@ -361,7 +361,7 @@ class MyClass extends Neo4jWrapper with SingletonEmbeddedGraphDatabaseServicePro
 ```
 
 
-##Batch Processing
+## Batch Processing
 
 Neo4j has a batch insertion mode intended for initial imports, which must run in a single thread and bypasses transactions and other checks in favor of performance. See [Batch insertion](http://docs.neo4j.org/chunked/milestone/indexing-batchinsert.html).
 
